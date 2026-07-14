@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>슬라이드 뷰어</title>
+<link rel="icon" type="image/png" href="회사심볼.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="hdr" id="hdr">
+    <div class="hdr-l">
+      <img class="hdr-logo" src="회사심볼.png" alt="회사 심볼">
+      <div class="hdr-titlewrap">
+        <div class="hdr-title">슬라이드 뷰어</div>
+        <div class="hdr-sub">이미지 슬라이드 열람 &amp; 관리 도구</div>
+      </div>
+    </div>
+    <div class="hdr-r">
+      <div class="seg">
+        <button class="seg-btn on" id="segSlide" onclick="setMode('slide')">
+          <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+          슬라이드
+        </button>
+        <button class="seg-btn" id="segGrid" onclick="setMode('grid')">
+          <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+          그리드
+        </button>
+      </div>
+      <button class="btn primary" id="addBtn" onclick="document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span class="lbl">이미지 추가</span>
+      </button>
+      <input type="file" id="fileInput" accept="image/*" multiple>
+      <button class="btn danger" id="clearAllBtn" onclick="clearAllSlides()" title="전체 슬라이드 삭제">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.8 12a1 1 0 0 1-1 .9H8.8a1 1 0 0 1-1-.9L7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="lbl">전체 삭제</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="hdr-toggle" id="hdrToggle" onclick="toggleHeader()" title="메뉴 접기/펴기">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div class="view-banner hidden" id="viewOnlyBanner">
+    보기 전용 모드입니다. 이미지를 추가·순서변경하려면 <b>프로그램 시작.bat</b>을 먼저 실행한 뒤 열어주세요.
+  </div>
+
+  <div class="lay">
+
+    <!-- 슬라이드 모드 -->
+    <div id="slideMode">
+      <div class="stage-wrap">
+        <div class="stage" id="stage">
+          <!-- content injected -->
+        </div>
+        <div class="nav-btn nav-prev" id="prevBtn" onclick="go(-1)">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="nav-btn nav-next" id="nextBtn" onclick="go(1)">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="thumb-toggle" id="thumbToggle" onclick="toggleThumbStrip()" title="슬라이드 목록 접기/펴기">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="thumb-strip" id="thumbStrip"></div>
+    </div>
+
+    <!-- 그리드 모드 -->
+    <div id="gridMode" class="grid-wrap hidden">
+      <div class="grid-hd">
+        <h2>전체 슬라이드</h2>
+        <span id="gridCount">0장</span>
+      </div>
+      <div class="gv" id="gridGrid"></div>
+    </div>
+
+  </div>
+
+<script src="slides-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# 실제 업로드된 슬라이드 데이터 (민감한 발표 자료 — 저장소에 포함하지 않음)
+images/
+slides.json
+slides-data.js
+
+# 1차 프로토타입 백업 (대용량, 샘플 이미지 base64 포함 — 더 이상 사용하지 않음)
+prototype_v1.html
+
+# OS/편집기 캐시
+Thumbs.db
+.DS_Store
