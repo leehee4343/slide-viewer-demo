@@ -61,9 +61,18 @@ function renderStage() {
   if (current > slides.length - 1) current = slides.length - 1;
   if (current < 0) current = 0;
   const s = slides[current];
+  const isFS = !!(document.fullscreenElement || document.getElementById('slideMode').classList.contains('fallback-fullscreen'));
+  const fsTitle = isFS ? '전체화면 종료 (Esc)' : '전체화면으로 보기';
+  const fsIcon = isFS
+    ? `<svg viewBox="0 0 24 24" fill="none"><path d="M4 14h6v6m0-6-6 6m16-6h-6v6m0-6 6 6M4 10h6V4m0 6-6-6m16 6h-6V4m0 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m0 8v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3m0-8V5a2 2 0 0 0-2-2h-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   stage.innerHTML = `
     <div class="counter-tag">${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}</div>
     <div class="stage-actions">
+      <button class="stage-btn" onclick="toggleFullscreen()" title="${fsTitle}">
+        ${fsIcon}
+      </button>
       <button class="stage-btn" onclick="downloadCurrentSlide()" title="이미지 다운로드">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -291,12 +300,43 @@ function onCardDragEnd(e) {
   dragSrcIndex = null;
 }
 
+/* ------------ 전체화면 토글 ------------ */
+async function toggleFullscreen() {
+  const elem = document.getElementById('slideMode');
+  if (!document.fullscreenElement) {
+    try {
+      await elem.requestFullscreen();
+    } catch (err) {
+      console.warn('Fullscreen failed, fallback to CSS:', err);
+      elem.classList.add('fallback-fullscreen');
+      renderStage();
+    }
+  } else {
+    document.exitFullscreen();
+  }
+}
+
 /* ------------ 이벤트 바인딩 ------------ */
 function bindEvents() {
   document.addEventListener('keydown', (e) => {
     if (mode !== 'slide') return;
     if (e.key === 'ArrowRight') go(1);
     if (e.key === 'ArrowLeft') go(-1);
+    if (e.key === 'Escape') {
+      const elem = document.getElementById('slideMode');
+      if (elem.classList.contains('fallback-fullscreen')) {
+        elem.classList.remove('fallback-fullscreen');
+        renderStage();
+      }
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    const elem = document.getElementById('slideMode');
+    if (!document.fullscreenElement) {
+      elem.classList.remove('fallback-fullscreen');
+    }
+    renderStage();
   });
 
   if (!serverMode) return; // 보기 전용 모드에서는 업로드/드래그 리스너를 걸지 않음

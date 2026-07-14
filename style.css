@@ -172,3 +172,125 @@ body{
   .hdr-title{font-size:14px;} .hdr-sub{display:none;}
   .btn span.lbl{display:none;}
 }
+
+/* ------------ 전체화면 모드 스타일 (HTML5 Fullscreen API & Fallback) ------------ */
+#slideMode:fullscreen,
+#slideMode.fallback-fullscreen {
+  background: #0b1528 !important; /* 더욱 깊고 집중도 높은 어두운 배경 */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#slideMode:fullscreen .stage-wrap,
+#slideMode.fallback-fullscreen .stage-wrap {
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#slideMode:fullscreen .stage,
+#slideMode.fallback-fullscreen .stage {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#slideMode:fullscreen .stage img,
+#slideMode.fallback-fullscreen .stage img {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* 전체화면 상태일 때 썸네일 스트립 및 토글 숨김 */
+#slideMode:fullscreen .thumb-strip,
+#slideMode:fullscreen .thumb-toggle,
+#slideMode.fallback-fullscreen .thumb-strip,
+#slideMode.fallback-fullscreen .thumb-toggle {
+  display: none !important;
+}
+
+/* 전체화면일 때 이전/다음 슬라이드 버튼 디자인 */
+#slideMode:fullscreen .nav-btn,
+#slideMode.fallback-fullscreen .nav-btn {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+}
+
+#slideMode:fullscreen .nav-btn svg,
+#slideMode.fallback-fullscreen .nav-btn svg {
+  stroke: #ffffff !important;
+  width: 28px;
+  height: 28px;
+}
+
+#slideMode:fullscreen .nav-btn:hover,
+#slideMode.fallback-fullscreen .nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+#slideMode:fullscreen .nav-prev,
+#slideMode.fallback-fullscreen .nav-prev {
+  left: 32px !important;
+}
+
+#slideMode:fullscreen .nav-next,
+#slideMode.fallback-fullscreen .nav-next {
+  right: 32px !important;
+}
+
+/* 전체화면 카운터 태그 스타일 조정 */
+#slideMode:fullscreen .counter-tag,
+#slideMode.fallback-fullscreen .counter-tag {
+  top: 24px !important;
+  left: 32px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 16px !important;
+  font-size: 13.5px !important;
+}
+
+/* 전체화면 액션 버튼 바 스타일 조정 */
+#slideMode:fullscreen .stage-actions,
+#slideMode.fallback-fullscreen .stage-actions {
+  top: 24px !important;
+  right: 32px !important;
+}
+
+#slideMode:fullscreen .stage-btn,
+#slideMode.fallback-fullscreen .stage-btn {
+  width: 38px;
+  height: 38px;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#slideMode:fullscreen .stage-btn:hover,
+#slideMode.fallback-fullscreen .stage-btn:hover {
+  background: var(--blue) !important;
+  border-color: var(--blue) !important;
+}
