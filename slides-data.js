@@ -2,423 +2,543 @@
 // 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.
 window.STATIC_SLIDES = [
   {
-    "id": "mrkrjryq0r1to3",
+    "id": "mrlhsfdviy1las",
     "name": "슬라이드#1",
-    "file": "images/mrkrjryq0r1to3.png",
+    "file": "images/mrlhsfdviy1las.png",
     "order": 0
   },
   {
-    "id": "mrkrjrzb4ftxyc",
+    "id": "mrlhsfeh8iqdzs",
     "name": "슬라이드#2",
-    "file": "images/mrkrjrzb4ftxyc.png",
+    "file": "images/mrlhsfeh8iqdzs.png",
     "order": 1
   },
   {
-    "id": "mrkrjrzvridi11",
+    "id": "mrlhsff2qvtoi0",
     "name": "슬라이드#3",
-    "file": "images/mrkrjrzvridi11.png",
+    "file": "images/mrlhsff2qvtoi0.png",
     "order": 2
   },
   {
-    "id": "mrkrjs0eigwszs",
+    "id": "mrlhsffnozjn4p",
     "name": "슬라이드#4",
-    "file": "images/mrkrjs0eigwszs.png",
+    "file": "images/mrlhsffnozjn4p.png",
     "order": 3
   },
   {
-    "id": "mrkrjs0wwccy3u",
+    "id": "mrlhsfg6s2p2py",
     "name": "슬라이드#5",
-    "file": "images/mrkrjs0wwccy3u.png",
+    "file": "images/mrlhsfg6s2p2py.png",
     "order": 4
   },
   {
-    "id": "mrkrjs1fjdxz6w",
+    "id": "mrlhsfgqvecllh",
     "name": "슬라이드#6",
-    "file": "images/mrkrjs1fjdxz6w.png",
+    "file": "images/mrlhsfgqvecllh.png",
     "order": 5
   },
   {
-    "id": "mrkrjs1ypnzy7e",
+    "id": "mrlhsfhbtu1rxf",
     "name": "슬라이드#7",
-    "file": "images/mrkrjs1ypnzy7e.png",
+    "file": "images/mrlhsfhbtu1rxf.png",
     "order": 6
   },
   {
-    "id": "mrkrjs2h19c442",
+    "id": "mrlhsfi3doc356",
     "name": "슬라이드#8",
-    "file": "images/mrkrjs2h19c442.png",
+    "file": "images/mrlhsfi3doc356.png",
     "order": 7
   },
   {
-    "id": "mrkrjs30mi1gol",
+    "id": "mrlhsfip4gf1tk",
     "name": "슬라이드#9",
-    "file": "images/mrkrjs30mi1gol.png",
+    "file": "images/mrlhsfip4gf1tk.png",
     "order": 8
   },
   {
-    "id": "mrkrjs3kzj54fa",
+    "id": "mrlhsfja9tcvrc",
     "name": "슬라이드#10",
-    "file": "images/mrkrjs3kzj54fa.png",
+    "file": "images/mrlhsfja9tcvrc.png",
     "order": 9
   },
   {
-    "id": "mrkrjs44a230ae",
+    "id": "mrlhsfjvumd2uw",
     "name": "슬라이드#11",
-    "file": "images/mrkrjs44a230ae.png",
+    "file": "images/mrlhsfjvumd2uw.png",
     "order": 10
   },
   {
-    "id": "mrkrjs4qw9nfow",
+    "id": "mrlhsfkjxg42kp",
     "name": "슬라이드#12",
-    "file": "images/mrkrjs4qw9nfow.png",
+    "file": "images/mrlhsfkjxg42kp.png",
     "order": 11
   },
   {
-    "id": "mrkrjs5bp0y5r9",
+    "id": "mrlhsfl6eft8os",
     "name": "슬라이드#13",
-    "file": "images/mrkrjs5bp0y5r9.png",
+    "file": "images/mrlhsfl6eft8os.png",
     "order": 12
   },
   {
-    "id": "mrkrjs5w9uvm5e",
+    "id": "mrlhsflsq6tdku",
     "name": "슬라이드#14",
-    "file": "images/mrkrjs5w9uvm5e.png",
+    "file": "images/mrlhsflsq6tdku.png",
     "order": 13
   },
   {
-    "id": "mrkrjs6h1z546o",
+    "id": "mrlhsfmie32w5o",
     "name": "슬라이드#15",
-    "file": "images/mrkrjs6h1z546o.png",
+    "file": "images/mrlhsfmie32w5o.png",
     "order": 14
   },
   {
-    "id": "mrkrjs7484lnsj",
+    "id": "mrlhsfn6595fvt",
     "name": "슬라이드#16",
-    "file": "images/mrkrjs7484lnsj.png",
+    "file": "images/mrlhsfn6595fvt.png",
     "order": 15
   },
   {
-    "id": "mrkrjs7r23kp44",
+    "id": "mrlhsfnvbsendr",
     "name": "슬라이드#17",
-    "file": "images/mrkrjs7r23kp44.png",
+    "file": "images/mrlhsfnvbsendr.png",
     "order": 16
   },
   {
-    "id": "mrkrjs8dlya53z",
+    "id": "mrlhsfojcx78fl",
     "name": "슬라이드#18",
-    "file": "images/mrkrjs8dlya53z.png",
+    "file": "images/mrlhsfojcx78fl.png",
     "order": 17
   },
   {
-    "id": "mrkrjs8yvx2kin",
+    "id": "mrlhsfp8o3vixc",
     "name": "슬라이드#19",
-    "file": "images/mrkrjs8yvx2kin.png",
+    "file": "images/mrlhsfp8o3vixc.png",
     "order": 18
   },
   {
-    "id": "mrkrjs9lqg4533",
+    "id": "mrlhsfpxpaz28y",
     "name": "슬라이드#20",
-    "file": "images/mrkrjs9lqg4533.png",
+    "file": "images/mrlhsfpxpaz28y.png",
     "order": 19
   },
   {
-    "id": "mrkrjsa76vsowb",
+    "id": "mrlhsfqmd2dutt",
     "name": "슬라이드#21",
-    "file": "images/mrkrjsa76vsowb.png",
+    "file": "images/mrlhsfqmd2dutt.png",
     "order": 20
   },
   {
-    "id": "mrkrjsata89inm",
+    "id": "mrlhsfrawkhzvs",
     "name": "슬라이드#22",
-    "file": "images/mrkrjsata89inm.png",
+    "file": "images/mrlhsfrawkhzvs.png",
     "order": 21
   },
   {
-    "id": "mrkrjsbfatijem",
+    "id": "mrlhsfrzojlqel",
     "name": "슬라이드#23",
-    "file": "images/mrkrjsbfatijem.png",
+    "file": "images/mrlhsfrzojlqel.png",
     "order": 22
   },
   {
-    "id": "mrkrjsc1t7l9p6",
+    "id": "mrlhsfsoiyxf7u",
     "name": "슬라이드#24",
-    "file": "images/mrkrjsc1t7l9p6.png",
+    "file": "images/mrlhsfsoiyxf7u.png",
     "order": 23
   },
   {
-    "id": "mrkrjscow60562",
+    "id": "mrlhsftdpcs1k1",
     "name": "슬라이드#25",
-    "file": "images/mrkrjscow60562.png",
+    "file": "images/mrlhsftdpcs1k1.png",
     "order": 24
   },
   {
-    "id": "mrkrjsdc362mzp",
+    "id": "mrlhsfu1wic9ab",
     "name": "슬라이드#26",
-    "file": "images/mrkrjsdc362mzp.png",
+    "file": "images/mrlhsfu1wic9ab.png",
     "order": 25
   },
   {
-    "id": "mrkrjsdtequ79h",
+    "id": "mrlhsfupfkxylf",
     "name": "슬라이드#27",
-    "file": "images/mrkrjsdtequ79h.png",
+    "file": "images/mrlhsfupfkxylf.png",
     "order": 26
   },
   {
-    "id": "mrkrjsebhjgfmb",
+    "id": "mrlhsfve933p3c",
     "name": "슬라이드#28",
-    "file": "images/mrkrjsebhjgfmb.png",
+    "file": "images/mrlhsfve933p3c.png",
     "order": 27
   },
   {
-    "id": "mrkrjsf0x914j0",
+    "id": "mrlhsfw5vgfx41",
     "name": "슬라이드#29",
-    "file": "images/mrkrjsf0x914j0.png",
+    "file": "images/mrlhsfw5vgfx41.png",
     "order": 28
   },
   {
-    "id": "mrkrjsfox6qk2t",
+    "id": "mrlhsfwx5jnulg",
     "name": "슬라이드#30",
-    "file": "images/mrkrjsfox6qk2t.png",
+    "file": "images/mrlhsfwx5jnulg.png",
     "order": 29
   },
   {
-    "id": "mrkrjsg6z0o9d0",
+    "id": "mrlhsfxm78kdu3",
     "name": "슬라이드#31",
-    "file": "images/mrkrjsg6z0o9d0.png",
+    "file": "images/mrlhsfxm78kdu3.png",
     "order": 30
   },
   {
-    "id": "mrkrjsgp26r4xt",
+    "id": "mrlhsfyay5p99q",
     "name": "슬라이드#32",
-    "file": "images/mrkrjsgp26r4xt.png",
+    "file": "images/mrlhsfyay5p99q.png",
     "order": 31
   },
   {
-    "id": "mrkrjsh7laqz20",
+    "id": "mrlhsfywcgyuse",
     "name": "슬라이드#33",
-    "file": "images/mrkrjsh7laqz20.png",
+    "file": "images/mrlhsfywcgyuse.png",
     "order": 32
   },
   {
-    "id": "mrkrjshoj9petn",
+    "id": "mrlhsfzqpbewv3",
     "name": "슬라이드#34",
-    "file": "images/mrkrjshoj9petn.png",
+    "file": "images/mrlhsfzqpbewv3.png",
     "order": 33
   },
   {
-    "id": "mrkrjsi6y9ewpa",
+    "id": "mrlhsg0djo8nxp",
     "name": "슬라이드#35",
-    "file": "images/mrkrjsi6y9ewpa.png",
+    "file": "images/mrlhsg0djo8nxp.png",
     "order": 34
   },
   {
-    "id": "mrkrjsip6j4pri",
+    "id": "mrlhsg12mail6q",
     "name": "슬라이드#36",
-    "file": "images/mrkrjsip6j4pri.png",
+    "file": "images/mrlhsg12mail6q.png",
     "order": 35
   },
   {
-    "id": "mrkrjsj9grycy8",
+    "id": "mrlhsg1p59h1so",
     "name": "슬라이드#37",
-    "file": "images/mrkrjsj9grycy8.png",
+    "file": "images/mrlhsg1p59h1so.png",
     "order": 36
   },
   {
-    "id": "mrkrjsjr22a1n6",
+    "id": "mrlhsg2e5m94k7",
     "name": "슬라이드#38",
-    "file": "images/mrkrjsjr22a1n6.png",
+    "file": "images/mrlhsg2e5m94k7.png",
     "order": 37
   },
   {
-    "id": "mrkrjsk9dpcecr",
+    "id": "mrlhsg340vw0tf",
     "name": "슬라이드#39",
-    "file": "images/mrkrjsk9dpcecr.png",
+    "file": "images/mrlhsg340vw0tf.png",
     "order": 38
   },
   {
-    "id": "mrkrjskst9jv5m",
+    "id": "mrlhsg3sqrhovy",
     "name": "슬라이드#40",
-    "file": "images/mrkrjskst9jv5m.png",
+    "file": "images/mrlhsg3sqrhovy.png",
     "order": 39
   },
   {
-    "id": "mrkrjslafh92bp",
+    "id": "mrlhsg4jesef6s",
     "name": "슬라이드#41",
-    "file": "images/mrkrjslafh92bp.png",
+    "file": "images/mrlhsg4jesef6s.png",
     "order": 40
   },
   {
-    "id": "mrkrjslufelju5",
+    "id": "mrlhsg585fxveg",
     "name": "슬라이드#42",
-    "file": "images/mrkrjslufelju5.png",
+    "file": "images/mrlhsg585fxveg.png",
     "order": 41
   },
   {
-    "id": "mrkrjsmdgq1ox5",
+    "id": "mrlhsg60b27b9k",
     "name": "슬라이드#43",
-    "file": "images/mrkrjsmdgq1ox5.png",
+    "file": "images/mrlhsg60b27b9k.png",
     "order": 42
   },
   {
-    "id": "mrkrjsmwsi370y",
+    "id": "mrlhsg6qg0rlp2",
     "name": "슬라이드#44",
-    "file": "images/mrkrjsmwsi370y.png",
+    "file": "images/mrlhsg6qg0rlp2.png",
     "order": 43
   },
   {
-    "id": "mrkrjsnh2chlmu",
+    "id": "mrlhsg7j3tqh5r",
     "name": "슬라이드#45",
-    "file": "images/mrkrjsnh2chlmu.png",
+    "file": "images/mrlhsg7j3tqh5r.png",
     "order": 44
   },
   {
-    "id": "mrkrjso1fphqxt",
+    "id": "mrlhsg8b5vxdmr",
     "name": "슬라이드#46",
-    "file": "images/mrkrjso1fphqxt.png",
+    "file": "images/mrlhsg8b5vxdmr.png",
     "order": 45
   },
   {
-    "id": "mrkrjsol9ctmzp",
+    "id": "mrlhsg96qhhgg3",
     "name": "슬라이드#47",
-    "file": "images/mrkrjsol9ctmzp.png",
+    "file": "images/mrlhsg96qhhgg3.png",
     "order": 46
   },
   {
-    "id": "mrkrjsp5s407gl",
+    "id": "mrlhsga283vdyz",
     "name": "슬라이드#48",
-    "file": "images/mrkrjsp5s407gl.png",
+    "file": "images/mrlhsga283vdyz.png",
     "order": 47
   },
   {
-    "id": "mrkrjsprueeh6w",
+    "id": "mrlhsgb1en4aw3",
     "name": "슬라이드#49",
-    "file": "images/mrkrjsprueeh6w.png",
+    "file": "images/mrlhsgb1en4aw3.png",
     "order": 48
   },
   {
-    "id": "mrkrjsqbs8w2zi",
+    "id": "mrlhsgbwcz4g0o",
     "name": "슬라이드#50",
-    "file": "images/mrkrjsqbs8w2zi.png",
+    "file": "images/mrlhsgbwcz4g0o.png",
     "order": 49
   },
   {
-    "id": "mrkrjsr4t6f3eh",
+    "id": "mrlhsgchc8afns",
     "name": "슬라이드#51",
-    "file": "images/mrkrjsr4t6f3eh.png",
+    "file": "images/mrlhsgchc8afns.png",
     "order": 50
   },
   {
-    "id": "mrkrjsrpl6iy4b",
+    "id": "mrlhsgdh9g5l2l",
     "name": "슬라이드#52",
-    "file": "images/mrkrjsrpl6iy4b.png",
+    "file": "images/mrlhsgdh9g5l2l.png",
     "order": 51
   },
   {
-    "id": "mrkrjssbxnqpkw",
+    "id": "mrlhsgeawbbr96",
     "name": "슬라이드#53",
-    "file": "images/mrkrjssbxnqpkw.png",
+    "file": "images/mrlhsgeawbbr96.png",
     "order": 52
   },
   {
-    "id": "mrkrjsswvljmp9",
+    "id": "mrlhsgf3s7v9er",
     "name": "슬라이드#54",
-    "file": "images/mrkrjsswvljmp9.png",
+    "file": "images/mrlhsgf3s7v9er.png",
     "order": 53
   },
   {
-    "id": "mrkrjstiinzszd",
+    "id": "mrlhsgftowb1h8",
     "name": "슬라이드#55",
-    "file": "images/mrkrjstiinzszd.png",
+    "file": "images/mrlhsgftowb1h8.png",
     "order": 54
   },
   {
-    "id": "mrkrjsuf1l0su6",
+    "id": "mrlhsggj7ggg9r",
     "name": "슬라이드#56",
-    "file": "images/mrkrjsuf1l0su6.png",
+    "file": "images/mrlhsggj7ggg9r.png",
     "order": 55
   },
   {
-    "id": "mrkrjsv4xi1ndy",
+    "id": "mrlhsghc2yqej1",
     "name": "슬라이드#57",
-    "file": "images/mrkrjsv4xi1ndy.png",
+    "file": "images/mrlhsghc2yqej1.png",
     "order": 56
   },
   {
-    "id": "mrkrjsvwmncxab",
+    "id": "mrlhsgi11kri7g",
     "name": "슬라이드#58",
-    "file": "images/mrkrjsvwmncxab.png",
+    "file": "images/mrlhsgi11kri7g.png",
     "order": 57
   },
   {
-    "id": "mrkrjswk2o9oe2",
+    "id": "mrlhsgirh38yt3",
     "name": "슬라이드#59",
-    "file": "images/mrkrjswk2o9oe2.png",
+    "file": "images/mrlhsgirh38yt3.png",
     "order": 58
   },
   {
-    "id": "mrkrjsx8f070dx",
+    "id": "mrlhsgjgdj5633",
     "name": "슬라이드#60",
-    "file": "images/mrkrjsx8f070dx.png",
+    "file": "images/mrlhsgjgdj5633.png",
     "order": 59
   },
   {
-    "id": "mrkrjsxu8evcd6",
+    "id": "mrlhsgk7b3j82t",
     "name": "슬라이드#61",
-    "file": "images/mrkrjsxu8evcd6.png",
+    "file": "images/mrlhsgk7b3j82t.png",
     "order": 60
   },
   {
-    "id": "mrkrjsyfvn3265",
+    "id": "mrlhsgkzrsbnzh",
     "name": "슬라이드#62",
-    "file": "images/mrkrjsyfvn3265.png",
+    "file": "images/mrlhsgkzrsbnzh.png",
     "order": 61
   },
   {
-    "id": "mrkrjsyyr4xd7z",
+    "id": "mrlhsglo6hhi80",
     "name": "슬라이드#63",
-    "file": "images/mrkrjsyyr4xd7z.png",
+    "file": "images/mrlhsglo6hhi80.png",
     "order": 62
   },
   {
-    "id": "mrkrjszkk6vmfn",
+    "id": "mrlhsgmek8x45t",
     "name": "슬라이드#64",
-    "file": "images/mrkrjszkk6vmfn.png",
+    "file": "images/mrlhsgmek8x45t.png",
     "order": 63
   },
   {
-    "id": "mrkrjt046p9y3m",
+    "id": "mrlhsgn5outgd4",
     "name": "슬라이드#65",
-    "file": "images/mrkrjt046p9y3m.png",
+    "file": "images/mrlhsgn5outgd4.png",
     "order": 64
   },
   {
-    "id": "mrkrjt0q6vy290",
+    "id": "mrlhsgnxvk5ige",
     "name": "슬라이드#66",
-    "file": "images/mrkrjt0q6vy290.png",
+    "file": "images/mrlhsgnxvk5ige.png",
     "order": 65
   },
   {
-    "id": "mrkrjt1br6wva0",
+    "id": "mrlhsgoosp3i12",
     "name": "슬라이드#67",
-    "file": "images/mrkrjt1br6wva0.png",
+    "file": "images/mrlhsgoosp3i12.png",
     "order": 66
   },
   {
-    "id": "mrkrjt1vhfws58",
+    "id": "mrlhsgpivyq37i",
     "name": "슬라이드#68",
-    "file": "images/mrkrjt1vhfws58.png",
+    "file": "images/mrlhsgpivyq37i.png",
     "order": 67
   },
   {
-    "id": "mrkrjt2g5kfwif",
+    "id": "mrlhsgq34rsyxy",
     "name": "슬라이드#69",
-    "file": "images/mrkrjt2g5kfwif.png",
+    "file": "images/mrlhsgq34rsyxy.png",
     "order": 68
   },
   {
-    "id": "mrkrjt2yol42dw",
+    "id": "mrlhsgqqa86dvs",
     "name": "슬라이드#70",
-    "file": "images/mrkrjt2yol42dw.png",
+    "file": "images/mrlhsgqqa86dvs.png",
     "order": 69
+  },
+  {
+    "id": "mrlhsgrcm9rw64",
+    "name": "슬라이드#71",
+    "file": "images/mrlhsgrcm9rw64.png",
+    "order": 70
+  },
+  {
+    "id": "mrlhsgs1yvw57l",
+    "name": "슬라이드#72",
+    "file": "images/mrlhsgs1yvw57l.png",
+    "order": 71
+  },
+  {
+    "id": "mrlhsgsoi3gv90",
+    "name": "슬라이드#73",
+    "file": "images/mrlhsgsoi3gv90.png",
+    "order": 72
+  },
+  {
+    "id": "mrlhsgtabg46fn",
+    "name": "슬라이드#74",
+    "file": "images/mrlhsgtabg46fn.png",
+    "order": 73
+  },
+  {
+    "id": "mrlhsgtx9vyrud",
+    "name": "슬라이드#75",
+    "file": "images/mrlhsgtx9vyrud.png",
+    "order": 74
+  },
+  {
+    "id": "mrlhsgulgyu2rg",
+    "name": "슬라이드#76",
+    "file": "images/mrlhsgulgyu2rg.png",
+    "order": 75
+  },
+  {
+    "id": "mrlhsgv8nfd93e",
+    "name": "슬라이드#77",
+    "file": "images/mrlhsgv8nfd93e.png",
+    "order": 76
+  },
+  {
+    "id": "mrlhsgvwyhen16",
+    "name": "슬라이드#78",
+    "file": "images/mrlhsgvwyhen16.png",
+    "order": 77
+  },
+  {
+    "id": "mrlhsgwipt9w4i",
+    "name": "슬라이드#79",
+    "file": "images/mrlhsgwipt9w4i.png",
+    "order": 78
+  },
+  {
+    "id": "mrlhsgx2q8iu13",
+    "name": "슬라이드#80",
+    "file": "images/mrlhsgx2q8iu13.png",
+    "order": 79
+  },
+  {
+    "id": "mrlhsgxmqa2xno",
+    "name": "슬라이드#81",
+    "file": "images/mrlhsgxmqa2xno.png",
+    "order": 80
+  },
+  {
+    "id": "mrlhsgy7ljl8tl",
+    "name": "슬라이드#82",
+    "file": "images/mrlhsgy7ljl8tl.png",
+    "order": 81
+  },
+  {
+    "id": "mrlhsgyty2gopx",
+    "name": "슬라이드#83",
+    "file": "images/mrlhsgyty2gopx.png",
+    "order": 82
+  },
+  {
+    "id": "mrlhsgzehu7w60",
+    "name": "슬라이드#84",
+    "file": "images/mrlhsgzehu7w60.png",
+    "order": 83
+  },
+  {
+    "id": "mrlhsgzzgwutru",
+    "name": "슬라이드#85",
+    "file": "images/mrlhsgzzgwutru.png",
+    "order": 84
+  },
+  {
+    "id": "mrlhsh0lzezohl",
+    "name": "슬라이드#86",
+    "file": "images/mrlhsh0lzezohl.png",
+    "order": 85
+  },
+  {
+    "id": "mrlhsh18as9vb9",
+    "name": "슬라이드#87",
+    "file": "images/mrlhsh18as9vb9.png",
+    "order": 86
+  },
+  {
+    "id": "mrlhsh1xrpwijw",
+    "name": "슬라이드#88",
+    "file": "images/mrlhsh1xrpwijw.png",
+    "order": 87
+  },
+  {
+    "id": "mrlhsh2ki1s60h",
+    "name": "슬라이드#89",
+    "file": "images/mrlhsh2ki1s60h.png",
+    "order": 88
+  },
+  {
+    "id": "mrlhsh39kzroho",
+    "name": "슬라이드#90",
+    "file": "images/mrlhsh39kzroho.png",
+    "order": 89
   }
 ];
