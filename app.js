@@ -1,13 +1,18 @@
 /* 슬라이드 뷰어 — 정식 버전 애플리케이션 로직
- * 서버 모드(server.js 실행 중): /api/slides 로 실제 파일 업로드/순서변경/전체삭제 (편집 가능)
- * 정적 모드(index.html을 그냥 열었을 때): slides-data.js의 STATIC_SLIDES를 읽어 보기 전용으로 표시
+ * 
+ * [데이터 공급 모드]
+ * 1. Supabase 모드 (GitHub Pages 등 웹 전체): 클라우드 DB 및 Storage 연동 (localStorage 세팅 시)
+ * 2. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템 저장
+ * 3. 정적 오프라인 모드: slides-data.js of STATIC_PROJECT_DATA를 읽는 보기 전용 폴백
  */
 
+let projects = [];     // [{id, name, slides}]
+let currentProjectId = 'default';
 let slides = [];       // [{id, name, file, order}]
 let current = 0;
 let mode = 'slide';
 let dragSrcIndex = null;
-let serverMode = false;
+let serverMode = false; // 편집 가능 상태 여부 (Supabase 혹은 로컬 Node 서버 연결 시 true)
 
 const stage = document.getElementById('stage');
 const thumbStrip = document.getElementById('thumbStrip');
@@ -20,24 +25,510 @@ const addBtn = document.getElementById('addBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
 const viewOnlyBanner = document.getElementById('viewOnlyBanner');
 
+const projectSelect = document.getElementById('projectSelect');
+const renameProjBtn = document.getElementById('renameProjBtn');
+const addProjBtn = document.getElementById('addProjBtn');
+const deleteProjBtn = document.getElementById('deleteProjBtn');
+
+/* ==================== 데이터 제공자 (Data Providers) 정의 ==================== */
+
+// 1. 로컬 Node.js 서버 데이터 제공자
+const LocalServerProvider = {
+  async getProjects() {
+    const res = await fetch('/api/projects', { cache: 'no-store' });
+    if (!res.ok) throw new Error('no server');
+    return res.json();
+  },
+  async selectActiveProject(projectId) {
+    await fetch(`/api/projects/active?projectId=${projectId}`, { method: 'PUT' });
+  },
+  async createProject(name) {
+    const res = await fetch(`/api/projects?name=${encodeURIComponent(name.trim())}`, { 
+      method: 'POST',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    if (!res.ok) throw new Error('Failed to create project');
+    return res.json();
+  },
+  async deleteProject(projectId) {
+    const res = await fetch(`/api/projects?projectId=${projectId}`, { 
+      method: 'DELETE',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    if (!res.ok) throw new Error('Failed to delete project');
+    return res.json();
+  },
+  async renameProject(projectId, name) {
+    const res = await fetch(`/api/projects/rename?projectId=${projectId}&name=${encodeURIComponent(name.trim())}`, {
+      method: 'PUT',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    if (!res.ok) throw new Error('Failed to rename project');
+    return res.json();
+  },
+  async getSlides(projectId) {
+    const res = await fetch(`/api/slides?projectId=${projectId}`);
+    if (!res.ok) throw new Error('Failed to fetch slides');
+    return res.json();
+  },
+  async uploadSlide(projectId, file, name, ext) {
+    const qs = new URLSearchParams({ projectId, name, ext });
+    const res = await fetch(`/api/slides?${qs.toString()}`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': file.type || 'application/octet-stream',
+        'X-Password': sessionStorage.getItem('viewer_pw') || ''
+      },
+      body: file,
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
+  },
+  async deleteSlides(projectId) {
+    const res = await fetch(`/api/slides?projectId=${projectId}`, { 
+      method: 'DELETE',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    if (!res.ok) throw new Error('Failed to delete slides');
+    return res.json();
+  },
+  async reorderSlides(projectId, pairs) {
+    const res = await fetch(`/api/slides/reorder?projectId=${projectId}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Password': sessionStorage.getItem('viewer_pw') || ''
+      },
+      body: JSON.stringify(pairs),
+    });
+    if (!res.ok) throw new Error('Reorder failed');
+    return res.json();
+  }
+};
+
+// 2. Supabase 클라우드 데이터 제공자
+let supabaseClient = null;
+const SupabaseProvider = {
+  async getProjects() {
+    const { data: dbProjects, error } = await supabaseClient
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    
+    let activeId = localStorage.getItem('sb_active_project_id');
+    if (!activeId && dbProjects.length > 0) {
+      activeId = dbProjects[0].id;
+      localStorage.setItem('sb_active_project_id', activeId);
+    } else if (dbProjects.length === 0) {
+      // 프로젝트가 하나도 없으면 강제 초기 생성
+      await supabaseClient.from('projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
+      activeId = 'default';
+      localStorage.setItem('sb_active_project_id', activeId);
+      return this.getProjects(); // 재귀 호출로 다시 정렬된 데이터 반환
+    }
+
+    const projectsWithSlides = await Promise.all(dbProjects.map(async p => {
+      const { data: dbSlides } = await supabaseClient
+        .from('slides')
+        .select('*')
+        .eq('project_id', p.id)
+        .order('order', { ascending: true });
+      
+      const mappedSlides = (dbSlides || []).map(s => ({
+        id: s.id,
+        name: s.name,
+        file: s.file_url,
+        order: s.order
+      }));
+
+      return {
+        id: p.id,
+        name: p.name,
+        slides: mappedSlides
+      };
+    }));
+
+    return {
+      currentProjectId: activeId,
+      projects: projectsWithSlides
+    };
+  },
+  async selectActiveProject(projectId) {
+    localStorage.setItem('sb_active_project_id', projectId);
+  },
+  async createProject(name) {
+    const id = makeId();
+    const { error } = await supabaseClient
+      .from('projects')
+      .insert([{ id, name }]);
+    if (error) throw error;
+    localStorage.setItem('sb_active_project_id', id);
+    return { ok: true, currentProjectId: id };
+  },
+  async deleteProject(projectId) {
+    // 1. 스토리지 파일들 삭제
+    try {
+      const { data: files } = await supabaseClient.storage
+        .from('slides')
+        .list(projectId);
+      if (files && files.length > 0) {
+        const paths = files.map(f => `${projectId}/${f.name}`);
+        await supabaseClient.storage.from('slides').remove(paths);
+      }
+    } catch (e) {
+      console.warn("Storage clean up failed during project delete:", e);
+    }
+
+    // 2. DB 삭제 (Cascade로 slides 도 자동 삭제됨)
+    const { error } = await supabaseClient
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+    if (error) throw error;
+
+    // 활성 프로젝트 갱신
+    const { data: dbProjects } = await supabaseClient.from('projects').select('id');
+    let nextActive = 'default';
+    if (dbProjects && dbProjects.length > 0) {
+      nextActive = dbProjects[0].id;
+    } else {
+      await supabaseClient.from('projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
+    }
+    localStorage.setItem('sb_active_project_id', nextActive);
+    
+    return { ok: true, currentProjectId: nextActive };
+  },
+  async renameProject(projectId, name) {
+    const { error } = await supabaseClient
+      .from('projects')
+      .update({ name })
+      .eq('id', projectId);
+    if (error) throw error;
+    return { ok: true };
+  },
+  async getSlides(projectId) {
+    const { data, error } = await supabaseClient
+      .from('slides')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('order', { ascending: true });
+    if (error) throw error;
+    
+    return data.map(s => ({
+      id: s.id,
+      name: s.name,
+      file: s.file_url,
+      order: s.order
+    }));
+  },
+  async uploadSlide(projectId, file, name, ext) {
+    const id = makeId();
+    const filename = `${id}${ext}`;
+    const filePath = `${projectId}/${filename}`;
+
+    // 1. Storage 버킷 'slides'에 업로드
+    const { error: uploadError } = await supabaseClient.storage
+      .from('slides')
+      .upload(filePath, file, {
+        contentType: file.type || 'application/octet-stream',
+        cacheControl: '3600',
+        upsert: false
+      });
+    if (uploadError) throw uploadError;
+
+    // 2. Public URL 획득
+    const { data: { publicUrl } } = supabaseClient.storage
+      .from('slides')
+      .getPublicUrl(filePath);
+
+    // 3. order 순서 결정을 위한 갯수 계산
+    const { data: existingSlides } = await supabaseClient
+      .from('slides')
+      .select('id')
+      .eq('project_id', projectId);
+    const nextOrder = existingSlides ? existingSlides.length : 0;
+
+    // 4. 데이터베이스 Insert
+    const { error: dbError } = await supabaseClient
+      .from('slides')
+      .insert([{
+        id,
+        project_id: projectId,
+        name,
+        file_url: publicUrl,
+        order: nextOrder
+      }]);
+    if (dbError) throw dbError;
+
+    return { id, name, file: publicUrl, order: nextOrder };
+  },
+  async deleteSlides(projectId) {
+    // 1. Storage 버킷 내 프로젝트 폴더 지우기
+    try {
+      const { data: files } = await supabaseClient.storage.from('slides').list(projectId);
+      if (files && files.length > 0) {
+        const paths = files.map(f => `${projectId}/${f.name}`);
+        await supabaseClient.storage.from('slides').remove(paths);
+      }
+    } catch (e) {
+      console.warn("Storage files delete failed during clearAll:", e);
+    }
+
+    // 2. DB slides 삭제
+    const { error } = await supabaseClient
+      .from('slides')
+      .delete()
+      .eq('project_id', projectId);
+    if (error) throw error;
+
+    return { ok: true, deleted: 1 };
+  },
+  async reorderSlides(projectId, pairs) {
+    const promises = pairs.map(({ id, order }) => 
+      supabaseClient
+        .from('slides')
+        .update({ order })
+        .eq('id', id)
+        .eq('project_id', projectId)
+    );
+    const results = await Promise.all(promises);
+    const err = results.find(r => r.error);
+    if (err) throw err.error;
+    return { ok: true };
+  }
+};
+
+// 3. 정적 보기 전용 오프라인 데이터 제공자
+const StaticDataProvider = {
+  getProjects() {
+    const staticData = window.STATIC_PROJECT_DATA || {
+      currentProjectId: "default",
+      projects: [{ id: "default", name: "기본 프로젝트", slides: [] }]
+    };
+    if (window.STATIC_SLIDES && !window.STATIC_PROJECT_DATA) {
+      staticData.projects[0].slides = window.STATIC_SLIDES;
+    }
+    return staticData;
+  },
+  async selectActiveProject(projectId) {},
+  async createProject() { throw new Error('오프라인 보기 전용 모드에서는 생성할 수 없습니다.'); },
+  async deleteProject() { throw new Error('오프라인 보기 전용 모드에서는 삭제할 수 없습니다.'); },
+  async renameProject() { throw new Error('오프라인 보기 전용 모드에서는 변경할 수 없습니다.'); },
+  async getSlides(projectId) {
+    const curProj = this.getProjects().projects.find(p => p.id === projectId);
+    return curProj ? curProj.slides.slice().sort((a, b) => a.order - b.order) : [];
+  },
+  async uploadSlide() { throw new Error('오프라인 보기 전용 모드에서는 업로드할 수 없습니다.'); },
+  async deleteSlides() { throw new Error('오프라인 보기 전용 모드에서는 삭제할 수 없습니다.'); },
+  async reorderSlides() { throw new Error('오프라인 보기 전용 모드에서는 정렬할 수 없습니다.'); }
+};
+
+// 기본 동작 제공자 매핑 (추후 init에서 결정됨)
+let db = StaticDataProvider;
+
+/* ------------ 유틸리티 ------------ */
+async function checkPassword() {
+  let pw = sessionStorage.getItem('viewer_pw');
+  if (pw === '4343') return true;
+  
+  pw = prompt("비밀번호를 입력하세요 (편집 권한):");
+  if (pw === '4343') {
+    sessionStorage.setItem('viewer_pw', '4343');
+    return true;
+  }
+  if (pw !== null) alert("비밀번호가 올바르지 않습니다.");
+  return false;
+}
+
+function updateUrlParameter(projectId) {
+  const newUrl = new URL(location.href);
+  if (newUrl.searchParams.get('project') !== projectId) {
+    newUrl.searchParams.set('project', projectId);
+    history.pushState({ projectId }, '', newUrl.toString());
+  }
+}
+
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
 /* ------------ 초기화 ------------ */
 async function init() {
-  try {
-    const res = await fetch('/api/slides', { cache: 'no-store' });
-    if (!res.ok) throw new Error('no server');
-    slides = (await res.json()).sort((a, b) => a.order - b.order);
-    serverMode = true;
-  } catch (e) {
-    slides = (window.STATIC_SLIDES || []).slice().sort((a, b) => a.order - b.order);
-    serverMode = false;
+  const sbUrl = localStorage.getItem('supabase_url');
+  const sbKey = localStorage.getItem('supabase_key');
+
+  if (sbUrl && sbKey && window.supabase) {
+    // 1. Supabase 모드로 실행
+    try {
+      supabaseClient = window.supabase.createClient(sbUrl, sbKey);
+      db = SupabaseProvider;
+      const data = await db.getProjects();
+      projects = data.projects;
+      currentProjectId = data.currentProjectId;
+      serverMode = true;
+      console.log("Supabase DB 및 스토리지 연동 완료");
+    } catch (e) {
+      console.error("Supabase 연결 실패 -> 정적 폴백:", e);
+      initStaticMode();
+    }
+  } else {
+    // 2. 로컬 Node.js 서버 감지 실행
+    try {
+      db = LocalServerProvider;
+      const data = await db.getProjects();
+      projects = data.projects;
+      currentProjectId = data.currentProjectId;
+      serverMode = true;
+      console.log("로컬 편집 서버 연동 완료");
+    } catch (e) {
+      // 3. 정적 보기 전용 모드 폴백
+      initStaticMode();
+    }
   }
+
+  const urlParams = new URLSearchParams(location.search);
+  const urlProjectId = urlParams.get('project');
+  if (urlProjectId && projects.some(p => p.id === urlProjectId)) {
+    currentProjectId = urlProjectId;
+  } else {
+    updateUrlParameter(currentProjectId);
+  }
+
   if (!serverMode) {
     viewOnlyBanner.classList.remove('hidden');
     addBtn.classList.add('hidden');
     clearAllBtn.classList.add('hidden');
+    if (renameProjBtn) renameProjBtn.classList.add('hidden');
+    if (addProjBtn) addProjBtn.classList.add('hidden');
+    if (deleteProjBtn) deleteProjBtn.classList.add('hidden');
+  } else {
+    viewOnlyBanner.classList.add('hidden');
+    addBtn.classList.remove('hidden');
+    clearAllBtn.classList.remove('hidden');
+    if (renameProjBtn) renameProjBtn.classList.remove('hidden');
+    if (addProjBtn) addProjBtn.classList.remove('hidden');
+    if (deleteProjBtn) deleteProjBtn.classList.remove('hidden');
   }
-  renderAll();
+
+  renderProjectSelect();
+  loadCurrentProjectSlides();
   bindEvents();
+}
+
+function initStaticMode() {
+  db = StaticDataProvider;
+  const staticData = db.getProjects();
+  projects = staticData.projects;
+  currentProjectId = staticData.currentProjectId;
+  serverMode = false;
+}
+
+function renderProjectSelect() {
+  if (!projectSelect) return;
+  projectSelect.innerHTML = projects.map(p => {
+    if (!p) return '';
+    const name = p.name || '이름없음';
+    const id = p.id || '';
+    return `<option value="${id}">${name}</option>`;
+  }).join('');
+  projectSelect.value = currentProjectId;
+}
+
+function loadCurrentProjectSlides() {
+  const curProj = projects.find(p => p.id === currentProjectId);
+  slides = curProj ? curProj.slides.slice().sort((a, b) => a.order - b.order) : [];
+  current = 0;
+  renderAll();
+}
+
+async function onProjectChange(projectId) {
+  currentProjectId = projectId;
+  updateUrlParameter(projectId);
+  if (serverMode) {
+    try {
+      await db.selectActiveProject(projectId);
+    } catch (e) {
+      console.error('Failed to save active project status', e);
+    }
+  }
+  loadCurrentProjectSlides();
+}
+
+async function createNewProject() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const name = prompt("새 프로젝트 이름을 입력하세요:");
+  if (!name || !name.trim()) return;
+  
+  try {
+    const data = await db.createProject(name);
+    
+    // 갱신
+    const manifest = await db.getProjects();
+    projects = manifest.projects;
+    currentProjectId = data.currentProjectId;
+    
+    renderProjectSelect();
+    updateUrlParameter(currentProjectId);
+    loadCurrentProjectSlides();
+  } catch (e) {
+    alert('프로젝트 생성 실패: ' + e.message);
+  }
+}
+
+async function deleteCurrentProject() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const curProj = projects.find(p => p.id === currentProjectId);
+  if (!curProj) return;
+  
+  if (projects.length <= 1) {
+    alert('최소 1개의 프로젝트는 유지해야 하므로 삭제할 수 없습니다.');
+    return;
+  }
+  
+  if (!confirm(`현재 프로젝트 '${curProj.name}'을(를) 삭제하시겠습니까?\n이 프로젝트의 모든 슬라이드 이미지 파일도 삭제됩니다.`)) return;
+  
+  try {
+    const data = await db.deleteProject(currentProjectId);
+    
+    // 갱신
+    const manifest = await db.getProjects();
+    projects = manifest.projects;
+    currentProjectId = data.currentProjectId;
+    
+    renderProjectSelect();
+    updateUrlParameter(currentProjectId);
+    loadCurrentProjectSlides();
+  } catch (e) {
+    alert('프로젝트 삭제 실패: ' + e.message);
+  }
+}
+
+async function renameCurrentProject() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const curProj = projects.find(p => p.id === currentProjectId);
+  if (!curProj) return;
+  
+  const newName = prompt("변경할 프로젝트 이름을 입력하세요:", curProj.name);
+  if (!newName || !newName.trim() || newName.trim() === curProj.name) return;
+  
+  try {
+    await db.renameProject(currentProjectId, newName);
+    
+    // 갱신
+    const manifest = await db.getProjects();
+    projects = manifest.projects;
+    
+    renderProjectSelect();
+  } catch (e) {
+    alert('이름 수정 실패: ' + e.message);
+  }
 }
 
 /* ------------ 렌더링 ------------ */
@@ -144,8 +635,6 @@ function downloadCurrentSlide() {
   const s = slides[current];
   if (!s) return;
   if (location.protocol === 'file:') {
-    // file://에서는 브라우저가 download 속성을 무시하고 현재 탭을 이미지로 이동시켜버리므로,
-    // 새 탭으로 열어 앱 화면을 유지하고 사용자가 직접 '다른 이름으로 저장'하도록 한다.
     window.open(s.file, '_blank');
     return;
   }
@@ -227,50 +716,75 @@ function setMode(m) {
 }
 
 async function persistOrder() {
-  if (!serverMode) return;
+  if (!serverMode) return true;
+  const ok = await checkPassword();
+  if (!ok) return false;
   const pairs = slides.map((s, i) => ({ id: s.id, order: i }));
-  await fetch('/api/slides/reorder', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(pairs),
-  });
-  slides.forEach((s, i) => { s.order = i; });
+  try {
+    await db.reorderSlides(currentProjectId, pairs);
+    slides.forEach((s, i) => { s.order = i; });
+    const curProj = projects.find(p => p.id === currentProjectId);
+    if (curProj) curProj.slides = slides;
+    return true;
+  } catch (e) {
+    alert('순서 변경 저장 실패: ' + e.message);
+    return false;
+  }
 }
 
 /* ------------ 전체 삭제 — 실제 파일도 서버에서 모두 삭제 ------------ */
 async function clearAllSlides() {
   if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
   if (slides.length === 0) { alert('삭제할 슬라이드가 없습니다.'); return; }
-  if (!confirm(`전체 슬라이드 ${slides.length}장을 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
-  await fetch('/api/slides', { method: 'DELETE' });
-  slides = [];
-  current = 0;
-  renderAll();
+  if (!confirm(`현재 프로젝트의 전체 슬라이드 ${slides.length}장을 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  
+  try {
+    await db.deleteSlides(currentProjectId);
+    slides = [];
+    current = 0;
+    const curProj = projects.find(p => p.id === currentProjectId);
+    if (curProj) curProj.slides = [];
+    renderAll();
+  } catch (e) {
+    alert('삭제 실패: ' + e.message);
+  }
 }
 
-/* ------------ 파일 업로드 (F-01) — images/ 폴더에 실제 파일로 저장 ------------ */
+async function triggerAddImages() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  fileInput.click();
+}
+
+/* ------------ 파일 업로드 — images/ 폴더 혹은 Supabase Storage 에 저장 ------------ */
 async function handleFiles(fileList) {
   if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
   const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   if (files.length === 0) return;
   const startIndex = slides.length;
-  for (const file of files) {
-    const baseName = file.name.replace(/\.[^/.]+$/, '');
-    const ext = (file.name.match(/\.[^/.]+$/) || [''])[0];
-    const qs = new URLSearchParams({ name: baseName, ext });
-    const res = await fetch(`/api/slides?${qs.toString()}`, {
-      method: 'POST',
-      headers: { 'Content-Type': file.type || 'application/octet-stream' },
-      body: file,
-    });
-    const slide = await res.json();
-    slides.push(slide);
+  try {
+    for (const file of files) {
+      const baseName = file.name.replace(/\.[^/.]+$/, '');
+      const ext = (file.name.match(/\.[^/.]+$/) || [''])[0];
+      
+      const slide = await db.uploadSlide(currentProjectId, file, baseName, ext);
+      slides.push(slide);
+    }
+    const curProj = projects.find(p => p.id === currentProjectId);
+    if (curProj) curProj.slides = slides;
+    current = startIndex;
+    renderAll();
+  } catch (e) {
+    alert('업로드 실패: ' + e.message);
   }
-  current = startIndex;
-  renderAll();
 }
 
-/* ------------ 그리드 드래그 순서 변경 (F-07) ------------ */
+/* ------------ 그리드 드래그 순서 변경 ------------ */
 function onCardDragStart(i, e) {
   dragSrcIndex = i;
   e.dataTransfer.effectAllowed = 'move';
@@ -288,10 +802,16 @@ async function onCardDrop(i, e) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if (dragSrcIndex === null || dragSrcIndex === i) return;
+  
+  const backup = slides.slice();
   const [moved] = slides.splice(dragSrcIndex, 1);
   slides.splice(i, 0, moved);
   dragSrcIndex = null;
-  await persistOrder();
+  
+  const success = await persistOrder();
+  if (!success) {
+    slides = backup;
+  }
   renderGrid();
 }
 function onCardDragEnd(e) {
@@ -316,8 +836,87 @@ async function toggleFullscreen() {
   }
 }
 
+/* ------------ Supabase 연동 설정 모달 관리 ------------ */
+function openConfigModal() {
+  document.getElementById('sbUrlInput').value = localStorage.getItem('supabase_url') || '';
+  document.getElementById('sbKeyInput').value = localStorage.getItem('supabase_key') || '';
+  
+  const clearBtn = document.getElementById('sbClearBtn');
+  if (localStorage.getItem('supabase_url')) {
+    clearBtn.classList.remove('hidden');
+  } else {
+    clearBtn.classList.add('hidden');
+  }
+  
+  document.getElementById('sbStatusMsg').classList.add('hidden');
+  document.getElementById('configModal').classList.remove('hidden');
+}
+
+function closeConfigModal() {
+  document.getElementById('configModal').classList.add('hidden');
+}
+
+function onModalOverlayClick(e) {
+  if (e.target.id === 'configModal') closeConfigModal();
+}
+
+async function saveSupabaseConfig() {
+  const url = document.getElementById('sbUrlInput').value.trim();
+  const key = document.getElementById('sbKeyInput').value.trim();
+  const statusMsg = document.getElementById('sbStatusMsg');
+
+  if (!url || !key) {
+    statusMsg.textContent = '모든 필드를 입력해 주세요.';
+    statusMsg.classList.remove('hidden');
+    statusMsg.classList.add('error');
+    return;
+  }
+
+  statusMsg.textContent = '연결 확인 중... (약 2~3초 소요)';
+  statusMsg.classList.remove('error');
+  statusMsg.classList.remove('hidden');
+
+  try {
+    if (!window.supabase) {
+      throw new Error('Supabase SDK가 정상 로드되지 않았습니다.');
+    }
+    const testClient = window.supabase.createClient(url, key);
+    // 테이블 읽기 권한을 테스트하기 위해 간단한 쿼리 전송
+    const { error } = await testClient.from('projects').select('id').limit(1);
+    if (error) throw error;
+
+    // 성공 시 LocalStorage 저장 후 리로드
+    localStorage.setItem('supabase_url', url);
+    localStorage.setItem('supabase_key', key);
+    location.reload();
+  } catch (err) {
+    statusMsg.textContent = 'Supabase 연결에 실패했습니다. DB SQL 세팅 및 스토리지 버킷이 올바른지 다시 확인해 주세요. (에러: ' + err.message + ')';
+    statusMsg.classList.add('error');
+    statusMsg.classList.remove('hidden');
+  }
+}
+
+function clearSupabaseConfig() {
+  if (confirm('Supabase 연동을 해제하시겠습니까? 해제 시 로컬 서버 또는 오프라인 모드로 복귀합니다.')) {
+    localStorage.removeItem('supabase_url');
+    localStorage.removeItem('supabase_key');
+    localStorage.removeItem('sb_active_project_id');
+    location.reload();
+  }
+}
+
 /* ------------ 이벤트 바인딩 ------------ */
 function bindEvents() {
+  window.addEventListener('popstate', (e) => {
+    const urlParams = new URLSearchParams(location.search);
+    const urlProjectId = urlParams.get('project');
+    if (urlProjectId && urlProjectId !== currentProjectId && projects.some(p => p.id === urlProjectId)) {
+      currentProjectId = urlProjectId;
+      if (projectSelect) projectSelect.value = currentProjectId;
+      loadCurrentProjectSlides();
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
     if (mode !== 'slide') return;
     if (e.key === 'ArrowRight') go(1);
