@@ -59,7 +59,10 @@ function ensureWorktree() {
   if (!dirExists || !isValidWorktree) {
     console.log('격리된 배포 작업공간(.demo-worktree)을 새로 만듭니다...');
     run(`git worktree add "${WORKTREE_NAME}" demo-deploy`, ROOT);
-  } else if (hasUnresolvedMerge()) {
+    return;
+  }
+
+  if (hasUnresolvedMerge()) {
     console.log('이전 실행에서 병합 충돌이 미해결 상태로 남아있어 정리합니다...');
     try {
       run('git merge --abort', WORKTREE_DIR);
@@ -67,10 +70,14 @@ function ensureWorktree() {
       console.error(`\n자동 정리에 실패했습니다. ${WORKTREE_NAME} 폴더에서 직접 확인해주세요.`);
       process.exit(1);
     }
-    console.log('기존 배포 작업공간(.demo-worktree)을 재사용합니다.');
-  } else {
-    console.log('기존 배포 작업공간(.demo-worktree)을 재사용합니다.');
   }
+
+  console.log('기존 배포 작업공간(.demo-worktree)을 재사용합니다.');
+  // 이 폴더의 images/slides.json/slides-data.js는 매 실행마다 통째로 다시 생성되므로,
+  // 이전 실행이 "취소"로 끝나며 남긴 staged/미커밋 변경사항은 안전하게 버려도 됩니다.
+  // (그래야 이번 merge가 "local changes would be overwritten" 오류 없이 진행됨)
+  run('git reset --hard HEAD', WORKTREE_DIR);
+  run('git clean -fd', WORKTREE_DIR);
 }
 
 function syncMainIntoWorktree() {
