@@ -6,6 +6,11 @@
  * 3. 정적 오프라인 모드: slides-data.js of STATIC_PROJECT_DATA를 읽는 보기 전용 폴백
  */
 
+// Supabase 기본 연동 설정 (여기에 본인의 URL과 Key를 입력해두면 모든 사용자가 수동 설정 입력 없이 자동으로 연동됩니다)
+const DEFAULT_SUPABASE_URL = "";
+const DEFAULT_SUPABASE_KEY = "";
+
+
 let projects = [];     // [{id, name, slides}]
 let currentProjectId = 'default';
 let slides = [];       // [{id, name, file, order}]
@@ -355,8 +360,9 @@ function makeId() {
 
 /* ------------ 초기화 ------------ */
 async function init() {
-  const sbUrl = localStorage.getItem('supabase_url');
-  const sbKey = localStorage.getItem('supabase_key');
+  const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
+  const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
+
 
   if (sbUrl && sbKey && window.supabase) {
     // 1. Supabase 모드로 실행
