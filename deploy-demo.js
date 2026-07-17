@@ -10,11 +10,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-// 콜백 기반 readline은 두 질문 사이(그 사이에 git 작업들이 끼어드는 동안)에
-// 입력이 이미 버퍼링되어 있으면 그 줄을 리스너 없이 그냥 흘려보내버려, 두 번째
-// 질문의 답이 유실되는 문제가 있습니다. readline/promises는 각 question() 호출이
-// 다음 줄을 정확히 기다렸다가 반환하므로 이 문제가 없습니다.
-const readline = require('readline/promises');
+const readline = require('readline');
 const { buildStaticDataFileContent } = require('./server.js');
 
 const ROOT = __dirname;
@@ -24,18 +20,31 @@ const MANIFEST_PATH = path.join(ROOT, 'slides.json');
 const DEMO_URL = 'https://leehee4343.github.io/slide-viewer-demo/';
 
 function run(cmd, cwd) {
-  // stdin은 'inherit'하지 않고 무시합니다 — 부모 프로세스와 stdin(fd 0)을 공유하면
-  // (특히 파일 리다이렉트처럼 오프셋을 공유하는 입력에서) git 하위 프로세스가
-  // readline이 읽어야 할 다음 줄(예: 최종 게시 확인 "yes")을 가로채 가버릴 수 있습니다.
   execSync(cmd, { cwd: cwd || ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
 }
 function runCapture(cmd, cwd) {
   return execSync(cmd, { cwd: cwd || ROOT }).toString().trim();
 }
+
+// readline의 question()은 (콜백 방식이든 readline/promises든) 입력이 전부 한번에
+// 도착하는 비-TTY 소스(파일 리다이렉트 등)에서, 질문이 실제로 걸려있지 않은 순간에
+// 도착한 줄을 조용히 흘려버리는 문제가 있습니다 — 그러면 다음 question()이 응답을
+// 영원히 기다리다 아무 에러 없이 프로세스가 끝나버립니다. 그래서 question()을 쓰지
+// 않고 'line' 이벤트를 큐에 직접 쌓아두는 방식으로 우회합니다 (도착 시점과 무관하게
+// 안전하며, 사람이 실제로 타이핑하는 경우에도 동일하게 잘 동작합니다).
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-async function ask(question) {
-  const ans = await rl.question(question);
-  return ans.trim();
+const lineQueue = [];
+const lineWaiters = [];
+rl.on('line', (line) => {
+  if (lineWaiters.length > 0) lineWaiters.shift()(line);
+  else lineQueue.push(line);
+});
+function ask(question) {
+  process.stdout.write(question);
+  return new Promise((resolve) => {
+    if (lineQueue.length > 0) resolve(lineQueue.shift().trim());
+    else lineWaiters.push((line) => resolve(line.trim()));
+  });
 }
 
 // 이전 실행이 병합 충돌 상태로 중단된 채 남아있는지 확인
