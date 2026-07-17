@@ -1,14 +1,22 @@
 /* 슬라이드 뷰어 — 정식 버전 애플리케이션 로직
  * 
  * [데이터 공급 모드]
- * 1. Supabase 모드 (GitHub Pages 등 웹 전체): 클라우드 DB 및 Storage 연동 (localStorage 세팅 시)
+ * 1. Supabase 모드 (PUBLIC_DEMO_HOSTS 제외): 클라우드 DB 및 Storage 연동 (localStorage 세팅 시)
  * 2. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템 저장
  * 3. 정적 오프라인 모드: slides-data.js of STATIC_PROJECT_DATA를 읽는 보기 전용 폴백
+ *
+ * PUBLIC_DEMO_HOSTS(GitHub Pages 공개 데모)에서는 Supabase 모드를 강제로 건너뛰어
+ * 항상 3번 정적 보기 전용 모드로만 동작합니다 — 누구나 접속 가능한 공개 페이지에서
+ * 공유 클라우드 DB를 생성/삭제/변경할 수 없도록 하기 위함입니다.
  */
 
 // Supabase 기본 연동 설정 (여기에 본인의 URL과 Key를 입력해두면 모든 사용자가 수동 설정 입력 없이 자동으로 연동됩니다)
 const DEFAULT_SUPABASE_URL = "https://viusyktclcquljfnquwv.supabase.co";
 const DEFAULT_SUPABASE_KEY = "sb_publishable_1L85qHVxfoeypCac3rjI7w_COe8M-ZW";
+
+// 공개 보기 전용 배포 호스트 — 이 목록에 해당하면 Supabase 편집 기능을 절대 활성화하지 않고
+// 정적 폴백(slides-data.js) 보기 전용 모드로만 동작합니다 (공개 사이트에서 DB 조작 방지)
+const PUBLIC_DEMO_HOSTS = ["leehee4343.github.io"];
 
 
 
@@ -396,34 +404,11 @@ function makeId() {
 
 /* ------------ 초기화 ------------ */
 async function init() {
-  // URL 파라미터로 Supabase Key/Url 자동 주입 (GitHub Secrets Scanning 푸시 거부 우회)
-  const urlParamsForInit = new URLSearchParams(location.search);
-  const queryKey = urlParamsForInit.get('key');
-  const queryUrl = urlParamsForInit.get('url');
-
-  if (queryKey) {
-    localStorage.setItem('supabase_key', queryKey);
-    // 기존 캐시된 낡은 URL로 인해 연동이 꼬이는 현상 방지를 위해 초기화
-    localStorage.removeItem('supabase_url');
-    urlParamsForInit.delete('key');
-  }
-  if (queryUrl) {
-    localStorage.setItem('supabase_url', queryUrl);
-    urlParamsForInit.delete('url');
-  }
-
-  // 주소창에서 키 파라미터 세척 및 히스토리 정돈
-  if (queryKey || queryUrl) {
-    const newSearch = urlParamsForInit.toString();
-    const newUrl = location.pathname + (newSearch ? '?' + newSearch : '') + location.hash;
-    history.replaceState(null, '', newUrl);
-  }
-
   const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
   const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
+  const isPublicDemoHost = PUBLIC_DEMO_HOSTS.includes(location.hostname);
 
-
-  if (sbUrl && sbKey && window.supabase) {
+  if (!isPublicDemoHost && sbUrl && sbKey && window.supabase) {
     // 1. Supabase 정보가 설정되어 있으면 (로컬/원격 무관) -> Supabase 모드를 1순위로 실행
     try {
       supabaseClient = window.supabase.createClient(sbUrl, sbKey);
