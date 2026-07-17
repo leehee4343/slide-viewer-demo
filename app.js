@@ -7,8 +7,9 @@
  */
 
 // Supabase 기본 연동 설정 (여기에 본인의 URL과 Key를 입력해두면 모든 사용자가 수동 설정 입력 없이 자동으로 연동됩니다)
-const DEFAULT_SUPABASE_URL = "";
-const DEFAULT_SUPABASE_KEY = "";
+const DEFAULT_SUPABASE_URL = "https://viusyktclcquljfnquwv.supabase.co";
+const DEFAULT_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpdXN5a3RjbGNxdWxqZm5xdXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwOTg1ODcsImV4cCI6MjA5NzY3NDU4N30.JI_xZORgZRGjvoir0wpyrXNkdMWB6fUqfTIJzMzxEJc";
+
 
 
 let projects = [];     // [{id, name, slides}]
