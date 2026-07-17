@@ -364,9 +364,10 @@ async function init() {
   const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
   const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
 
+  const isLocalHost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-  if (sbUrl && sbKey && window.supabase) {
-    // 1. Supabase 모드로 실행
+  if (!isLocalHost && sbUrl && sbKey && window.supabase) {
+    // 1. 외부 서버리스 웹 환경(GitHub Pages 등)이고 Supabase 정보가 있으면 -> Supabase 모드로 실행
     try {
       supabaseClient = window.supabase.createClient(sbUrl, sbKey);
       db = SupabaseProvider;
@@ -380,7 +381,7 @@ async function init() {
       initStaticMode();
     }
   } else {
-    // 2. 로컬 Node.js 서버 감지 실행
+    // 2. 로컬호스트(localhost) 환경이거나 Supabase 설정이 없으면 -> 기존 로컬 Node.js 서버 감지 실행
     try {
       db = LocalServerProvider;
       const data = await db.getProjects();
@@ -393,6 +394,7 @@ async function init() {
       initStaticMode();
     }
   }
+
 
   const urlParams = new URLSearchParams(location.search);
   const urlProjectId = urlParams.get('project');
