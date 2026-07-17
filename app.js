@@ -1,17 +1,18 @@
 /* 슬라이드 뷰어 — 정식 버전 애플리케이션 로직
  *
- * [데이터 공급 모드 — 우선순위 순]
- * 1. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템에 저장. 실제
- *    편집(업로드/삭제/순서변경)이 가능한 유일한 경로입니다.
- * 2. Supabase 모드 (PUBLIC_DEMO_HOSTS 제외, 로컬 서버가 없을 때만): 클라우드 DB에서
- *    "보기 전용"으로만 동작합니다. Supabase anon 키로는 절대 쓰기(편집)를 시도하지
- *    않으며(serverMode를 켜지 않음), 실제로도 RLS가 anon 쓰기를 차단해야 합니다.
+ * [데이터 공급 모드 — 우선순위 순, 모든 호스트에서 동일하게 적용]
+ * 1. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템에 저장.
+ *    실제 편집(업로드/삭제/순서변경)이 가능한 유일한 경로입니다.
+ * 2. Supabase 모드 (로컬 서버가 없을 때만): 클라우드 DB에서 "보기 전용"으로만
+ *    동작합니다. Supabase anon 키로는 절대 쓰기(편집)를 시도하지 않으며
+ *    (serverMode를 켜지 않음), 실제로도 RLS가 anon 쓰기를 차단해야 합니다.
  * 3. 정적 오프라인 모드: slides-data.js의 STATIC_PROJECT_DATA를 읽는 보기 전용 폴백.
  *
- * PUBLIC_DEMO_HOSTS(GitHub Pages 공개 데모)에서는 Supabase 자체를 시도하지 않고
- * 항상 3번 정적 폴백만 사용합니다 — Supabase 쪽에는 아직 공개 승인되지 않은
- * 프로젝트가 섞여 있을 수 있기 때문에, "읽기 전용이라 안전하다"가 아니라
- * 애초에 노출하지 않는 것입니다.
+ * "실시간 동기화" 구조: 로컬 서버(server.js)는 프로젝트별로 공개(public) 여부를
+ * 관리합니다. 공개로 표시된 프로젝트만 service_role 키(로컬 전용, 절대 커밋 안 됨)로
+ * Supabase에 반영되므로, Supabase에는 애초에 공개 승인된 프로젝트만 존재합니다 —
+ * 그래서 이 앱은 어느 호스트에서 열리든(로컬이든 GitHub Pages 공개 데모든) 동일한
+ * 우선순위 로직을 그대로 써도 안전합니다.
  */
 
 // ⚠️ 중요: 이 URL/KEY는 이 저장소를 clone/fork하는 누구나 그대로 읽을 수 있습니다
@@ -22,12 +23,6 @@
 // RLS가 제대로 걸려 있다면, 이 키가 그대로 노출되어도 읽기만 가능하고 쓰기는 불가능합니다.
 const DEFAULT_SUPABASE_URL = "https://viusyktclcquljfnquwv.supabase.co";
 const DEFAULT_SUPABASE_KEY = "sb_publishable_1L85qHVxfoeypCac3rjI7w_COe8M-ZW";
-
-// 공개 보기 전용 배포 호스트 — 이 목록에 해당하면 Supabase 자체를 시도하지 않고
-// 정적 폴백(slides-data.js)만 사용합니다 (공개 승인 안 된 프로젝트 노출 방지).
-// 이 저장소를 포크해 다른 호스트에 배포하면 이 목록에 없으므로 Supabase 모드가
-// 활성화되지만, 위 설계상 그래도 "보기 전용"으로만 동작합니다(RLS가 올바르다면).
-const PUBLIC_DEMO_HOSTS = ["leehee4343.github.io"];
 
 
 
@@ -53,6 +48,7 @@ const clearAllBtn = document.getElementById('clearAllBtn');
 
 const projectSelect = document.getElementById('projectSelect');
 const renameProjBtn = document.getElementById('renameProjBtn');
+const togglePublicBtn = document.getElementById('togglePublicBtn');
 const addProjBtn = document.getElementById('addProjBtn');
 const deleteProjBtn = document.getElementById('deleteProjBtn');
 
@@ -91,6 +87,15 @@ const LocalServerProvider = {
     });
     if (!res.ok) throw new Error('Failed to rename project');
     return res.json();
+  },
+  async setProjectPublic(projectId, isPublic) {
+    const res = await fetch(`/api/projects/public?projectId=${projectId}&public=${isPublic}`, {
+      method: 'PUT',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Failed to change public status');
+    return data;
   },
   async getSlides(projectId) {
     const res = await fetch(`/api/slides?projectId=${projectId}`);
@@ -415,16 +420,7 @@ function makeId() {
 
 /* ------------ 초기화 ------------ */
 async function init() {
-  const isPublicDemoHost = PUBLIC_DEMO_HOSTS.includes(location.hostname);
-
-  if (isPublicDemoHost) {
-    // 공개 데모에서는 Supabase 자체를 시도하지 않고 정적 폴백만 사용합니다.
-    // (아직 공개 승인되지 않은 프로젝트가 Supabase 쪽에 섞여 있을 수 있으므로,
-    //  '읽기 전용이라 안전하다'가 아니라 애초에 노출 자체를 하지 않습니다)
-    initStaticMode();
-  } else {
-    await initLocalFirstThenSupabaseThenStatic();
-  }
+  await initLocalFirstThenSupabaseThenStatic();
 
   const urlParams = new URLSearchParams(location.search);
   const urlProjectId = urlParams.get('project');
@@ -438,12 +434,14 @@ async function init() {
     addBtn.classList.add('hidden');
     clearAllBtn.classList.add('hidden');
     if (renameProjBtn) renameProjBtn.classList.add('hidden');
+    if (togglePublicBtn) togglePublicBtn.classList.add('hidden');
     if (addProjBtn) addProjBtn.classList.add('hidden');
     if (deleteProjBtn) deleteProjBtn.classList.add('hidden');
   } else {
     addBtn.classList.remove('hidden');
     clearAllBtn.classList.remove('hidden');
     if (renameProjBtn) renameProjBtn.classList.remove('hidden');
+    if (togglePublicBtn) togglePublicBtn.classList.remove('hidden');
     if (addProjBtn) addProjBtn.classList.remove('hidden');
     if (deleteProjBtn) deleteProjBtn.classList.remove('hidden');
   }
@@ -510,6 +508,18 @@ function renderProjectSelect() {
     return `<option value="${id}">${name}</option>`;
   }).join('');
   projectSelect.value = currentProjectId;
+  updateTogglePublicBtn();
+}
+
+function updateTogglePublicBtn() {
+  if (!togglePublicBtn) return;
+  const curProj = projects.find(p => p.id === currentProjectId);
+  const isPublic = !!(curProj && curProj.public);
+  togglePublicBtn.textContent = isPublic ? '공개중' : '비공개';
+  togglePublicBtn.classList.toggle('public-on', isPublic);
+  togglePublicBtn.title = isPublic
+    ? '공개 데모(다른 기기)에서 볼 수 있습니다 — 클릭하면 비공개로 전환'
+    : '지금은 이 컴퓨터에서만 보입니다 — 클릭하면 공개 데모에도 표시';
 }
 
 function loadCurrentProjectSlides() {
@@ -529,6 +539,7 @@ async function onProjectChange(projectId) {
       console.error('Failed to save active project status', e);
     }
   }
+  updateTogglePublicBtn();
   loadCurrentProjectSlides();
 }
 
@@ -605,6 +616,28 @@ async function renameCurrentProject() {
     renderProjectSelect();
   } catch (e) {
     alert('이름 수정 실패: ' + e.message);
+  }
+}
+
+async function toggleCurrentProjectPublic() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const curProj = projects.find(p => p.id === currentProjectId);
+  if (!curProj) return;
+
+  const goingPublic = !curProj.public;
+  const msg = goingPublic
+    ? `'${curProj.name}' 프로젝트를 공개로 전환할까요?\n다른 기기(공개 데모 포함)에서 이 프로젝트의 슬라이드를 볼 수 있게 됩니다.`
+    : `'${curProj.name}' 프로젝트를 비공개로 전환할까요?\n다른 기기에서 더 이상 이 프로젝트를 볼 수 없게 됩니다.`;
+  if (!confirm(msg)) return;
+
+  try {
+    const data = await db.setProjectPublic(currentProjectId, goingPublic);
+    curProj.public = data.project ? data.project.public : goingPublic;
+    updateTogglePublicBtn();
+  } catch (e) {
+    alert('공개 상태 변경 실패: ' + e.message);
   }
 }
 

@@ -12,3 +12,9 @@ Thumbs.db
 
 # deploy-demo.js가 사용하는 격리된 배포용 git worktree (공개 데모 브랜치 작업공간)
 .demo-worktree/
+
+# 로컬 백업 폴더 (images/slides.json 등을 초기화하기 전 백업본)
+_backup_*/
+
+# Supabase service_role 키 — RLS를 우회하는 강력한 권한이라 절대 커밋하지 않음
+.supabase-service.json
