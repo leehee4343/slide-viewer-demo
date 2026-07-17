@@ -1,28 +1,32 @@
 /* 슬라이드 뷰어 — 정식 버전 애플리케이션 로직
- * 
- * [데이터 공급 모드]
- * 1. Supabase 모드 (PUBLIC_DEMO_HOSTS 제외): 클라우드 DB 및 Storage 연동 (localStorage 세팅 시)
- * 2. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템 저장
- * 3. 정적 오프라인 모드: slides-data.js of STATIC_PROJECT_DATA를 읽는 보기 전용 폴백
  *
- * PUBLIC_DEMO_HOSTS(GitHub Pages 공개 데모)에서는 Supabase 모드를 강제로 건너뛰어
- * 항상 3번 정적 보기 전용 모드로만 동작합니다 — 누구나 접속 가능한 공개 페이지에서
- * 공유 클라우드 DB를 생성/삭제/변경할 수 없도록 하기 위함입니다.
+ * [데이터 공급 모드 — 우선순위 순]
+ * 1. 로컬 서버 모드 (server.js 실행 중): /api/slides 로 로컬 파일 시스템에 저장. 실제
+ *    편집(업로드/삭제/순서변경)이 가능한 유일한 경로입니다.
+ * 2. Supabase 모드 (PUBLIC_DEMO_HOSTS 제외, 로컬 서버가 없을 때만): 클라우드 DB에서
+ *    "보기 전용"으로만 동작합니다. Supabase anon 키로는 절대 쓰기(편집)를 시도하지
+ *    않으며(serverMode를 켜지 않음), 실제로도 RLS가 anon 쓰기를 차단해야 합니다.
+ * 3. 정적 오프라인 모드: slides-data.js의 STATIC_PROJECT_DATA를 읽는 보기 전용 폴백.
+ *
+ * PUBLIC_DEMO_HOSTS(GitHub Pages 공개 데모)에서는 Supabase 자체를 시도하지 않고
+ * 항상 3번 정적 폴백만 사용합니다 — Supabase 쪽에는 아직 공개 승인되지 않은
+ * 프로젝트가 섞여 있을 수 있기 때문에, "읽기 전용이라 안전하다"가 아니라
+ * 애초에 노출하지 않는 것입니다.
  */
 
-// ⚠️ 중요: 이 URL/KEY와 checkPassword()의 비밀번호는 이 저장소를 clone/fork하는
-// 누구나 그대로 읽을 수 있습니다 (공개 저장소에 그대로 포함됨). 아래 PUBLIC_DEMO_HOSTS
-// 검사는 "이 앱의 화면"을 통한 우발적 접근만 막을 뿐, 이 URL/KEY로 Supabase REST API를
-// 브라우저 없이 직접 호출하는 것까지는 막지 못합니다. 진짜 방어선은 Supabase 프로젝트의
-// Row Level Security(RLS) 정책이 익명(anon) 쓰기를 거부하도록 설정하는 것입니다 —
-// 반드시 Supabase 대시보드에서 sv_projects / sv_slides 테이블의 RLS를 확인하세요.
+// ⚠️ 중요: 이 URL/KEY는 이 저장소를 clone/fork하는 누구나 그대로 읽을 수 있습니다
+// (공개 저장소에 포함됨). 이 키로는 절대 편집(쓰기)을 시도하지 않도록 앱을 만들었지만,
+// 진짜 방어선은 Supabase 프로젝트의 Row Level Security(RLS) 정책이 익명(anon) 쓰기를
+// 거부하도록 설정되어 있는지입니다 — 반드시 Supabase 대시보드에서
+// sv_projects / sv_slides 테이블 및 sv_slides_bucket 스토리지의 RLS를 확인하세요.
+// RLS가 제대로 걸려 있다면, 이 키가 그대로 노출되어도 읽기만 가능하고 쓰기는 불가능합니다.
 const DEFAULT_SUPABASE_URL = "https://viusyktclcquljfnquwv.supabase.co";
 const DEFAULT_SUPABASE_KEY = "sb_publishable_1L85qHVxfoeypCac3rjI7w_COe8M-ZW";
 
-// 공개 보기 전용 배포 호스트 — 이 목록에 해당하면 Supabase 편집 기능을 절대 활성화하지 않고
-// 정적 폴백(slides-data.js) 보기 전용 모드로만 동작합니다 (공개 사이트에서 DB 조작 방지).
-// 이 저장소를 포크해 다른 호스트(예: 다른 계정의 GitHub Pages)에 그대로 배포하면
-// 이 목록에 없으므로 Supabase 모드가 그대로 활성화된다는 점에 유의하세요.
+// 공개 보기 전용 배포 호스트 — 이 목록에 해당하면 Supabase 자체를 시도하지 않고
+// 정적 폴백(slides-data.js)만 사용합니다 (공개 승인 안 된 프로젝트 노출 방지).
+// 이 저장소를 포크해 다른 호스트에 배포하면 이 목록에 없으므로 Supabase 모드가
+// 활성화되지만, 위 설계상 그래도 "보기 전용"으로만 동작합니다(RLS가 올바르다면).
 const PUBLIC_DEMO_HOSTS = ["leehee4343.github.io"];
 
 
@@ -34,7 +38,7 @@ let slides = [];       // [{id, name, file, order}]
 let current = 0;
 let mode = 'slide';
 let dragSrcIndex = null;
-let serverMode = false; // 편집 가능 상태 여부 (Supabase 혹은 로컬 Node 서버 연결 시 true)
+let serverMode = false; // 편집 가능 상태 여부 (로컬 Node 서버 연결 시에만 true, Supabase는 항상 보기 전용)
 
 const stage = document.getElementById('stage');
 const thumbStrip = document.getElementById('thumbStrip');
@@ -411,26 +415,15 @@ function makeId() {
 
 /* ------------ 초기화 ------------ */
 async function init() {
-  const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
-  const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
   const isPublicDemoHost = PUBLIC_DEMO_HOSTS.includes(location.hostname);
 
-  if (!isPublicDemoHost && sbUrl && sbKey && window.supabase) {
-    // 1. Supabase 정보가 설정되어 있으면 (로컬/원격 무관) -> Supabase 모드를 1순위로 실행
-    try {
-      supabaseClient = window.supabase.createClient(sbUrl, sbKey);
-      db = SupabaseProvider;
-      const data = await db.getProjects();
-      projects = data.projects;
-      currentProjectId = data.currentProjectId;
-      serverMode = true;
-      console.log("Supabase DB 및 스토리지 연동 완료 (공용 클라우드 데이터 공유)");
-    } catch (e) {
-      console.error("Supabase 연결 실패 -> 로컬 서버 또는 정적 폴백으로 대체:", e);
-      await initLocalOrStaticFallback();
-    }
+  if (isPublicDemoHost) {
+    // 공개 데모에서는 Supabase 자체를 시도하지 않고 정적 폴백만 사용합니다.
+    // (아직 공개 승인되지 않은 프로젝트가 Supabase 쪽에 섞여 있을 수 있으므로,
+    //  '읽기 전용이라 안전하다'가 아니라 애초에 노출 자체를 하지 않습니다)
+    initStaticMode();
   } else {
-    await initLocalOrStaticFallback();
+    await initLocalFirstThenSupabaseThenStatic();
   }
 
   const urlParams = new URLSearchParams(location.search);
@@ -460,19 +453,43 @@ async function init() {
   bindEvents();
 }
 
-async function initLocalOrStaticFallback() {
-  // 2. 기존 로컬 Node.js 서버 감지 및 실행 (2순위)
+async function initLocalFirstThenSupabaseThenStatic() {
+  // 1순위: 로컬 편집 서버 (server.js) — 실제 편집(업로드/삭제/순서변경)이 가능한 유일한 경로
   try {
     db = LocalServerProvider;
     const data = await db.getProjects();
     projects = data.projects;
     currentProjectId = data.currentProjectId;
     serverMode = true;
-    console.log("로컬 편집 서버 연동 완료 (로컬 파일 시스템 사용)");
+    console.log("로컬 편집 서버 연동 완료 (편집 가능)");
+    return;
   } catch (e) {
-    // 3. 정적 보기 전용 모드 폴백 (3순위)
-    initStaticMode();
+    // 로컬 서버가 없으면 다음 단계로
   }
+
+  // 2순위: Supabase — 보기 전용(읽기)으로만 사용합니다. Supabase 프로젝트의 RLS가
+  // anon 키의 쓰기(INSERT/UPDATE/DELETE)를 차단하도록 설정되어 있어야 하며,
+  // 여기서는 그 전제하에 절대 serverMode를 true로 켜지 않습니다 — 편집 버튼을
+  // 노출해봐야 실제로는 RLS에 막혀 실패할 뿐이므로 아예 보여주지 않는 것입니다.
+  const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
+  const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
+  if (sbUrl && sbKey && window.supabase) {
+    try {
+      supabaseClient = window.supabase.createClient(sbUrl, sbKey);
+      db = SupabaseProvider;
+      const data = await db.getProjects();
+      projects = data.projects;
+      currentProjectId = data.currentProjectId;
+      serverMode = false;
+      console.log("Supabase 연동 완료 (보기 전용)");
+      return;
+    } catch (e) {
+      console.error("Supabase 연결 실패 -> 정적 폴백으로 대체:", e);
+    }
+  }
+
+  // 3순위: 정적 보기 전용 모드 폴백
+  initStaticMode();
 }
 
 
