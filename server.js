@@ -305,6 +305,40 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, deleted: deletedCount });
     }
 
+    if (pathname === '/api/slides/delete' && req.method === 'DELETE') {
+      if (!verifyPassword(req, res)) return;
+      const manifest = readManifest();
+      const projectId = u.searchParams.get('projectId') || manifest.currentProjectId;
+      const slideId = u.searchParams.get('slideId');
+      if (!slideId) { res.writeHead(400); return res.end('missing slideId'); }
+
+      const proj = manifest.projects.find(p => p.id === projectId);
+      if (!proj) return sendJSON(res, 404, { error: 'project not found' });
+
+      const idx = proj.slides.findIndex(s => s.id === slideId);
+      if (idx === -1) return sendJSON(res, 404, { error: 'slide not found' });
+
+      const slide = proj.slides[idx];
+      // 1. 물리 파일 삭제
+      const imgPath = path.join(ROOT, slide.file);
+      if (fs.existsSync(imgPath)) {
+        try { fs.unlinkSync(imgPath); } catch(e) {}
+      }
+
+      // 2. 배열에서 제거
+      proj.slides.splice(idx, 1);
+
+      // 3. order 재배열
+      proj.slides.sort((a, b) => a.order - b.order).forEach((s, i) => {
+        s.order = i;
+      });
+
+      writeManifest(manifest);
+      regenerateStaticData();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+
     if (pathname === '/api/slides/reorder' && req.method === 'PUT') {
       if (!verifyPassword(req, res)) return;
       const manifest = readManifest();

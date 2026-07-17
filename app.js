@@ -110,8 +110,17 @@ const LocalServerProvider = {
     });
     if (!res.ok) throw new Error('Reorder failed');
     return res.json();
+  },
+  async deleteSlide(projectId, slideId) {
+    const res = await fetch(`/api/slides/delete?projectId=${projectId}&slideId=${slideId}`, {
+      method: 'DELETE',
+      headers: { 'X-Password': sessionStorage.getItem('viewer_pw') || '' }
+    });
+    if (!res.ok) throw new Error('Delete failed');
+    return res.json();
   }
 };
+
 
 // 2. Supabase 클라우드 데이터 제공자
 let supabaseClient = null;
@@ -303,8 +312,33 @@ const SupabaseProvider = {
     const err = results.find(r => r.error);
     if (err) throw err.error;
     return { ok: true };
+  },
+  async deleteSlide(projectId, slideId) {
+    const { data: slideData } = await supabaseClient
+      .from('sv_slides')
+      .select('file_url')
+      .eq('id', slideId)
+      .single();
+
+    if (slideData && slideData.file_url) {
+      const parts = slideData.file_url.split('/sv_slides_bucket/');
+      if (parts.length > 1) {
+        const filePath = decodeURIComponent(parts[1]);
+        await supabaseClient.storage.from('sv_slides_bucket').remove([filePath]);
+      }
+    }
+
+    const { error } = await supabaseClient
+      .from('sv_slides')
+      .delete()
+      .eq('id', slideId)
+      .eq('project_id', projectId);
+
+    if (error) throw error;
+    return { ok: true };
   }
 };
+
 
 // 3. 정적 보기 전용 오프라인 데이터 제공자
 const StaticDataProvider = {
@@ -592,9 +626,16 @@ function renderStage() {
     ? `<svg viewBox="0 0 24 24" fill="none"><path d="M4 14h6v6m0-6-6 6m16-6h-6v6m0-6 6 6M4 10h6V4m0 6-6-6m16 6h-6V4m0 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
     : `<svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m0 8v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3m0-8V5a2 2 0 0 0-2-2h-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
+  const deleteBtnHtml = serverMode ? `
+      <button class="stage-btn danger-hover" onclick="deleteCurrentSlide()" title="이 슬라이드 삭제">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M19 7l-.8 12a2 2 0 0 1-2 1.8H7.8a2 2 0 0 1-2-1.8L5 7M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+  ` : '';
+
   stage.innerHTML = `
     <div class="counter-tag">${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}</div>
     <div class="stage-actions">
+      ${deleteBtnHtml}
       <button class="stage-btn" onclick="toggleFullscreen()" title="${fsTitle}">
         ${fsIcon}
       </button>
@@ -648,8 +689,17 @@ function renderGrid() {
         ondragleave="onCardDragLeave(${i}, event)"
         ondrop="onCardDrop(${i}, event)"
         ondragend="onCardDragEnd(event)"` : '';
+    const gridDeleteBtn = serverMode ? `
+        <button class="gc-delete" onclick="deleteGridSlide(${i}, '${s.id}', event)" title="이 슬라이드 삭제">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+    ` : '';
+
     html += `<div class="gc" ${dragAttrs} onclick="jumpFromGrid(${i})">
-      <div class="gimg"><img src="${s.file}" alt="${s.name}"></div>
+      <div class="gimg">
+        <img src="${s.file}" alt="${s.name}">
+        ${gridDeleteBtn}
+      </div>
       <div class="gc-ft">
         <b>${String(i + 1).padStart(2, '0')}. ${s.name}</b>
       </div>
@@ -783,6 +833,71 @@ async function clearAllSlides() {
     renderAll();
   } catch (e) {
     alert('삭제 실패: ' + e.message);
+  }
+}
+
+async function deleteCurrentSlide() {
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const s = slides[current];
+  if (!s) return;
+  
+  if (!confirm(`현재 슬라이드 '${s.name}'을(를) 정말 삭제하시겠습니까?`)) return;
+  
+  try {
+    await db.deleteSlide(currentProjectId, s.id);
+    
+    // 로컬 메모리 배열에서 제거
+    slides.splice(current, 1);
+    
+    // 순서 재조정
+    slides.forEach((item, index) => {
+      item.order = index;
+    });
+    
+    const curProj = projects.find(p => p.id === currentProjectId);
+    if (curProj) curProj.slides = slides;
+    
+    // 인덱스 보정
+    if (current >= slides.length) {
+      current = Math.max(0, slides.length - 1);
+    }
+    
+    renderAll();
+  } catch (e) {
+    alert('슬라이드 삭제 실패: ' + e.message);
+  }
+}
+
+async function deleteGridSlide(index, slideId, event) {
+  if (event) event.stopPropagation(); // 카드 점프 방지
+  if (!serverMode) return;
+  const ok = await checkPassword();
+  if (!ok) return;
+  const s = slides[index];
+  if (!s || s.id !== slideId) return;
+  
+  if (!confirm(`슬라이드 '${s.name}'을(를) 정말 삭제하시겠습니까?`)) return;
+  
+  try {
+    await db.deleteSlide(currentProjectId, slideId);
+    
+    slides.splice(index, 1);
+    slides.forEach((item, idx) => {
+      item.order = idx;
+    });
+    
+    const curProj = projects.find(p => p.id === currentProjectId);
+    if (curProj) curProj.slides = slides;
+    
+    if (current >= slides.length) {
+      current = Math.max(0, slides.length - 1);
+    }
+    
+    renderAll();
+  } catch (e) {
+    alert('슬라이드 삭제 실패: ' + e.message);
   }
 }
 

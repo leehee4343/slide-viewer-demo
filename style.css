@@ -632,4 +632,84 @@ body{
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* 개별 삭제 버튼 스타일링 */
+.stage-btn.danger-hover:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #ef4444 !important;
+}
+
+.gimg {
+  position: relative;
+}
+
+.gc-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease, transform 0.2s ease;
+  z-index: 10;
+  padding: 0;
+}
+
+.gc-delete svg {
+  width: 12px;
+  height: 12px;
+}
+
+.gc:hover .gc-delete {
+  opacity: 1;
+}
+
+.gc-delete:hover {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  transform: scale(1.1);
+}
+
+/* 프로젝트 제어용 텍스트 보더 버튼 */
+.btn.border-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ccd6f6;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  height: 36px;
+  border-radius: 8px;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.btn.border-btn:hover {
+  background: rgba(100, 255, 218, 0.08);
+  border-color: #64ffda;
+  color: #64ffda;
+}
+
+.btn.border-btn.danger {
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #a8b2d1;
+}
+
+.btn.border-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+
+
 
