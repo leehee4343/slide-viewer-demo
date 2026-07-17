@@ -24,7 +24,10 @@ const MANIFEST_PATH = path.join(ROOT, 'slides.json');
 const DEMO_URL = 'https://leehee4343.github.io/slide-viewer-demo/';
 
 function run(cmd, cwd) {
-  execSync(cmd, { cwd: cwd || ROOT, stdio: 'inherit' });
+  // stdin은 'inherit'하지 않고 무시합니다 — 부모 프로세스와 stdin(fd 0)을 공유하면
+  // (특히 파일 리다이렉트처럼 오프셋을 공유하는 입력에서) git 하위 프로세스가
+  // readline이 읽어야 할 다음 줄(예: 최종 게시 확인 "yes")을 가로채 가버릴 수 있습니다.
+  execSync(cmd, { cwd: cwd || ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
 }
 function runCapture(cmd, cwd) {
   return execSync(cmd, { cwd: cwd || ROOT }).toString().trim();
