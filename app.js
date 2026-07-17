@@ -10,12 +10,19 @@
  * 공유 클라우드 DB를 생성/삭제/변경할 수 없도록 하기 위함입니다.
  */
 
-// Supabase 기본 연동 설정 (여기에 본인의 URL과 Key를 입력해두면 모든 사용자가 수동 설정 입력 없이 자동으로 연동됩니다)
+// ⚠️ 중요: 이 URL/KEY와 checkPassword()의 비밀번호는 이 저장소를 clone/fork하는
+// 누구나 그대로 읽을 수 있습니다 (공개 저장소에 그대로 포함됨). 아래 PUBLIC_DEMO_HOSTS
+// 검사는 "이 앱의 화면"을 통한 우발적 접근만 막을 뿐, 이 URL/KEY로 Supabase REST API를
+// 브라우저 없이 직접 호출하는 것까지는 막지 못합니다. 진짜 방어선은 Supabase 프로젝트의
+// Row Level Security(RLS) 정책이 익명(anon) 쓰기를 거부하도록 설정하는 것입니다 —
+// 반드시 Supabase 대시보드에서 sv_projects / sv_slides 테이블의 RLS를 확인하세요.
 const DEFAULT_SUPABASE_URL = "https://viusyktclcquljfnquwv.supabase.co";
 const DEFAULT_SUPABASE_KEY = "sb_publishable_1L85qHVxfoeypCac3rjI7w_COe8M-ZW";
 
 // 공개 보기 전용 배포 호스트 — 이 목록에 해당하면 Supabase 편집 기능을 절대 활성화하지 않고
-// 정적 폴백(slides-data.js) 보기 전용 모드로만 동작합니다 (공개 사이트에서 DB 조작 방지)
+// 정적 폴백(slides-data.js) 보기 전용 모드로만 동작합니다 (공개 사이트에서 DB 조작 방지).
+// 이 저장소를 포크해 다른 호스트(예: 다른 계정의 GitHub Pages)에 그대로 배포하면
+// 이 목록에 없으므로 Supabase 모드가 그대로 활성화된다는 점에 유의하세요.
 const PUBLIC_DEMO_HOSTS = ["leehee4343.github.io"];
 
 

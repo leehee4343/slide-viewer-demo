@@ -3,14 +3,19 @@
  * git worktree(.demo-worktree/)를 사용해 배포 작업을 완전히 격리합니다.
  * → main 작업 디렉토리의 파일(images/, slides.json 등)은 절대 건드리지 않습니다.
  * → 어떤 프로젝트를 공개할지 매번 직접 선택해야 하며, 최종 게시 전 한 번 더 확인합니다.
+ *
+ * 주의: 한 번 공개했던 프로젝트를 이후 선택 해제해도, 그 이미지는 demo 저장소의
+ * git 히스토리에는 계속 남습니다(완전 삭제가 아니라 "이번 배포부터 제외"일 뿐).
  */
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { buildStaticDataFileContent } = require('./server.js');
 
 const ROOT = __dirname;
-const WORKTREE_DIR = path.join(ROOT, '.demo-worktree');
+const WORKTREE_NAME = '.demo-worktree';
+const WORKTREE_DIR = path.join(ROOT, WORKTREE_NAME);
 const MANIFEST_PATH = path.join(ROOT, 'slides.json');
 const DEMO_URL = 'https://leehee4343.github.io/slide-viewer-demo/';
 
@@ -25,11 +30,66 @@ function ask(question) {
   return new Promise((resolve) => rl.question(question, (ans) => { rl.close(); resolve(ans.trim()); }));
 }
 
-function regenerateStaticContent(manifest) {
-  return `// 자동 생성 파일 — 서버 없이 index.html을 직접 열었을 때 표시되는 슬라이드 목록입니다. 직접 수정하지 마세요.
-// 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.
-window.STATIC_PROJECT_DATA = ${JSON.stringify(manifest, null, 2)};
-`;
+// 이전 실행이 병합 충돌 상태로 중단된 채 남아있는지 확인
+function hasUnresolvedMerge() {
+  return fs.existsSync(path.join(WORKTREE_DIR, '.git')) &&
+    (() => {
+      try {
+        runCapture('git rev-parse -q --verify MERGE_HEAD', WORKTREE_DIR);
+        return true;
+      } catch {
+        return false;
+      }
+    })();
+}
+
+function ensureWorktree() {
+  // 디스크에서 폴더만 수동으로 지워진 경우 등, git의 내부 worktree 등록 정보가
+  // 실제 폴더 상태와 어긋나 있을 수 있으므로 먼저 정리합니다.
+  run('git worktree prune');
+
+  const dirExists = fs.existsSync(WORKTREE_DIR);
+  const isValidWorktree = dirExists && fs.existsSync(path.join(WORKTREE_DIR, '.git'));
+
+  if (dirExists && !isValidWorktree) {
+    console.log(`${WORKTREE_NAME} 폴더가 손상된 상태로 보여 다시 만듭니다...`);
+    fs.rmSync(WORKTREE_DIR, { recursive: true, force: true });
+  }
+
+  if (!dirExists || !isValidWorktree) {
+    console.log('격리된 배포 작업공간(.demo-worktree)을 새로 만듭니다...');
+    run(`git worktree add "${WORKTREE_NAME}" demo-deploy`, ROOT);
+    return;
+  }
+
+  if (hasUnresolvedMerge()) {
+    console.log('이전 실행에서 병합 충돌이 미해결 상태로 남아있어 정리합니다...');
+    try {
+      run('git merge --abort', WORKTREE_DIR);
+    } catch {
+      console.error(`\n자동 정리에 실패했습니다. ${WORKTREE_NAME} 폴더에서 직접 확인해주세요.`);
+      process.exit(1);
+    }
+  }
+
+  console.log('기존 배포 작업공간(.demo-worktree)을 재사용합니다.');
+  // 이 폴더의 images/slides.json/slides-data.js는 매 실행마다 통째로 다시 생성되므로,
+  // 이전 실행이 "취소"로 끝나며 남긴 staged/미커밋 변경사항은 안전하게 버려도 됩니다.
+  // (그래야 이번 merge가 "local changes would be overwritten" 오류 없이 진행됨)
+  run('git reset --hard HEAD', WORKTREE_DIR);
+  run('git clean -fd', WORKTREE_DIR);
+}
+
+function syncMainIntoWorktree() {
+  console.log('\nmain의 최신 코드 변경사항을 배포 브랜치에 반영합니다...');
+  try {
+    run('git merge main -m "sync: main 코드 변경사항 반영"', WORKTREE_DIR);
+  } catch (e) {
+    console.error(`\n병합 중 오류가 발생했습니다 (충돌이거나 다른 git 문제일 수 있습니다).`);
+    console.error(`${WORKTREE_NAME} 폴더에서 'git status'로 원인을 확인해 직접 해결한 뒤 다시 실행해주세요.`);
+    console.error('(git merge --abort 로 병합을 취소하고 다시 시작할 수도 있습니다)');
+    process.exit(1);
+  }
 }
 
 async function main() {
@@ -40,26 +100,14 @@ async function main() {
     process.exit(1);
   }
 
-  const dirty = runCapture('git status --porcelain -- . ":(exclude).demo-worktree"');
+  const dirty = runCapture('git status --porcelain');
   if (dirty) {
     console.error('main 브랜치에 커밋되지 않은 변경사항이 있습니다. 먼저 정리한 뒤 다시 실행해주세요.');
     process.exit(1);
   }
 
-  if (!fs.existsSync(WORKTREE_DIR)) {
-    console.log('격리된 배포 작업공간(.demo-worktree)을 새로 만듭니다...');
-    run(`git worktree add "${WORKTREE_DIR}" demo-deploy`);
-  } else {
-    console.log('기존 배포 작업공간(.demo-worktree)을 재사용합니다.');
-  }
-
-  console.log('\nmain의 최신 코드 변경사항을 배포 브랜치에 반영합니다...');
-  try {
-    run('git merge main -m "sync: main 코드 변경사항 반영"', WORKTREE_DIR);
-  } catch (e) {
-    console.error('\nmerge 충돌이 발생했습니다. .demo-worktree 폴더에서 직접 해결한 뒤 다시 실행해주세요.');
-    process.exit(1);
-  }
+  ensureWorktree();
+  syncMainIntoWorktree();
 
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
   console.log('\n로컬에 존재하는 프로젝트 목록:');
@@ -85,22 +133,35 @@ async function main() {
   fs.rmSync(wtImages, { recursive: true, force: true });
   fs.mkdirSync(wtImages, { recursive: true });
 
+  const missingFiles = [];
   selected.forEach((p) => {
     p.slides.forEach((s) => {
       const src = path.join(ROOT, s.file);
+      if (!fs.existsSync(src)) {
+        missingFiles.push(`${p.name} / ${s.name} (${s.file})`);
+        return;
+      }
       const dst = path.join(WORKTREE_DIR, s.file);
       fs.mkdirSync(path.dirname(dst), { recursive: true });
       fs.copyFileSync(src, dst);
     });
   });
 
+  if (missingFiles.length > 0) {
+    console.log(`\n⚠ 다음 ${missingFiles.length}개 슬라이드는 원본 파일을 찾을 수 없어 건너뜁니다:`);
+    missingFiles.forEach((m) => console.log(`  - ${m}`));
+  }
+
   const deployManifest = { currentProjectId: selected[0].id, projects: selected };
   fs.writeFileSync(path.join(WORKTREE_DIR, 'slides.json'), JSON.stringify(deployManifest, null, 2), 'utf-8');
-  fs.writeFileSync(path.join(WORKTREE_DIR, 'slides-data.js'), regenerateStaticContent(deployManifest), 'utf-8');
+  fs.writeFileSync(path.join(WORKTREE_DIR, 'slides-data.js'), buildStaticDataFileContent(deployManifest), 'utf-8');
 
   run('git add -f images/ slides.json slides-data.js', WORKTREE_DIR);
   console.log('\n--- 변경 요약 (.demo-worktree 기준) ---');
   run('git status --short', WORKTREE_DIR);
+
+  console.log('\n※ 참고: 이번에 선택 해제한 프로젝트가 과거에 한 번이라도 게시된 적 있다면,');
+  console.log('   demo 저장소의 git 히스토리에는 그 이미지가 계속 남아있습니다(완전 삭제 아님).');
 
   const confirm = await ask('\n위 내용을 공개 데모 사이트에 실제로 게시할까요? ("yes" 입력 시에만 진행): ');
   if (confirm !== 'yes') {
