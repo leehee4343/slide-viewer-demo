@@ -364,10 +364,8 @@ async function init() {
   const sbUrl = localStorage.getItem('supabase_url') || DEFAULT_SUPABASE_URL;
   const sbKey = localStorage.getItem('supabase_key') || DEFAULT_SUPABASE_KEY;
 
-  const isLocalHost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-
-  if (!isLocalHost && sbUrl && sbKey && window.supabase) {
-    // 1. 외부 서버리스 웹 환경(GitHub Pages 등)이고 Supabase 정보가 있으면 -> Supabase 모드로 실행
+  if (sbUrl && sbKey && window.supabase) {
+    // 1. Supabase 정보가 설정되어 있으면 (로컬/원격 무관) -> Supabase 모드를 1순위로 실행
     try {
       supabaseClient = window.supabase.createClient(sbUrl, sbKey);
       db = SupabaseProvider;
@@ -375,25 +373,31 @@ async function init() {
       projects = data.projects;
       currentProjectId = data.currentProjectId;
       serverMode = true;
-      console.log("Supabase DB 및 스토리지 연동 완료");
+      console.log("Supabase DB 및 스토리지 연동 완료 (공용 클라우드 데이터 공유)");
     } catch (e) {
-      console.error("Supabase 연결 실패 -> 정적 폴백:", e);
-      initStaticMode();
+      console.error("Supabase 연결 실패 -> 로컬 서버 또는 정적 폴백으로 대체:", e);
+      await initLocalOrStaticFallback();
     }
   } else {
-    // 2. 로컬호스트(localhost) 환경이거나 Supabase 설정이 없으면 -> 기존 로컬 Node.js 서버 감지 실행
-    try {
-      db = LocalServerProvider;
-      const data = await db.getProjects();
-      projects = data.projects;
-      currentProjectId = data.currentProjectId;
-      serverMode = true;
-      console.log("로컬 편집 서버 연동 완료");
-    } catch (e) {
-      // 3. 정적 보기 전용 모드 폴백
-      initStaticMode();
-    }
+    await initLocalOrStaticFallback();
   }
+}
+
+async function initLocalOrStaticFallback() {
+  // 2. 기존 로컬 Node.js 서버 감지 및 실행 (2순위)
+  try {
+    db = LocalServerProvider;
+    const data = await db.getProjects();
+    projects = data.projects;
+    currentProjectId = data.currentProjectId;
+    serverMode = true;
+    console.log("로컬 편집 서버 연동 완료 (로컬 파일 시스템 사용)");
+  } catch (e) {
+    // 3. 정적 보기 전용 모드 폴백 (3순위)
+    initStaticMode();
+  }
+}
+
 
 
   const urlParams = new URLSearchParams(location.search);
