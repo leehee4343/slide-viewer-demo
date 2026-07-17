@@ -777,6 +777,21 @@ async function handleFiles(fileList) {
   if (!ok) return;
   const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   if (files.length === 0) return;
+
+  const progressOverlay = document.getElementById('uploadProgressOverlay');
+  const progressText = document.getElementById('progressText');
+  const progressBarFill = document.getElementById('progressBarFill');
+
+  const total = files.length;
+  let currentUploaded = 0;
+
+  // 프로그레스 바 표시 초기화
+  if (progressOverlay) {
+    progressText.textContent = `0 / ${total}장 완료`;
+    progressBarFill.style.width = '0%';
+    progressOverlay.classList.remove('hidden');
+  }
+
   const startIndex = slides.length;
   try {
     for (const file of files) {
@@ -785,6 +800,13 @@ async function handleFiles(fileList) {
       
       const slide = await db.uploadSlide(currentProjectId, file, baseName, ext);
       slides.push(slide);
+
+      currentUploaded++;
+      if (progressOverlay) {
+        progressText.textContent = `${currentUploaded} / ${total}장 완료`;
+        const percentage = Math.round((currentUploaded / total) * 100);
+        progressBarFill.style.width = `${percentage}%`;
+      }
     }
     const curProj = projects.find(p => p.id === currentProjectId);
     if (curProj) curProj.slides = slides;
@@ -792,8 +814,16 @@ async function handleFiles(fileList) {
     renderAll();
   } catch (e) {
     alert('업로드 실패: ' + e.message);
+  } finally {
+    // 자연스러운 페이드아웃 효과를 위해 약간의 지연 후 닫기
+    if (progressOverlay) {
+      setTimeout(() => {
+        progressOverlay.classList.add('hidden');
+      }, 500);
+    }
   }
 }
+
 
 /* ------------ 그리드 드래그 순서 변경 ------------ */
 function onCardDragStart(i, e) {

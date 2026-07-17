@@ -94,7 +94,22 @@
 
   </div>
 
+  <!-- 업로드 프로그레스 바 오버레이 -->
+  <div class="upload-progress-overlay hidden" id="uploadProgressOverlay">
+    <div class="upload-progress-card">
+      <div class="spinner"></div>
+      <div class="progress-info">
+        <h4 id="progressTitle">슬라이드 업로드 중...</h4>
+        <span id="progressText">0 / 0장 완료</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+      </div>
+    </div>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <script src="slides-data.js"></script>
 <script src="app.js"></script>
