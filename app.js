@@ -29,7 +29,7 @@ const nextBtn = document.getElementById('nextBtn');
 const fileInput = document.getElementById('fileInput');
 const addBtn = document.getElementById('addBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
-const viewOnlyBanner = document.getElementById('viewOnlyBanner');
+
 
 const projectSelect = document.getElementById('projectSelect');
 const renameProjBtn = document.getElementById('renameProjBtn');
@@ -403,14 +403,12 @@ async function init() {
   }
 
   if (!serverMode) {
-    viewOnlyBanner.classList.remove('hidden');
     addBtn.classList.add('hidden');
     clearAllBtn.classList.add('hidden');
     if (renameProjBtn) renameProjBtn.classList.add('hidden');
     if (addProjBtn) addProjBtn.classList.add('hidden');
     if (deleteProjBtn) deleteProjBtn.classList.add('hidden');
   } else {
-    viewOnlyBanner.classList.add('hidden');
     addBtn.classList.remove('hidden');
     clearAllBtn.classList.remove('hidden');
     if (renameProjBtn) renameProjBtn.classList.remove('hidden');
@@ -843,75 +841,6 @@ async function toggleFullscreen() {
   }
 }
 
-/* ------------ Supabase 연동 설정 모달 관리 ------------ */
-function openConfigModal() {
-  document.getElementById('sbUrlInput').value = localStorage.getItem('supabase_url') || '';
-  document.getElementById('sbKeyInput').value = localStorage.getItem('supabase_key') || '';
-  
-  const clearBtn = document.getElementById('sbClearBtn');
-  if (localStorage.getItem('supabase_url')) {
-    clearBtn.classList.remove('hidden');
-  } else {
-    clearBtn.classList.add('hidden');
-  }
-  
-  document.getElementById('sbStatusMsg').classList.add('hidden');
-  document.getElementById('configModal').classList.remove('hidden');
-}
-
-function closeConfigModal() {
-  document.getElementById('configModal').classList.add('hidden');
-}
-
-function onModalOverlayClick(e) {
-  if (e.target.id === 'configModal') closeConfigModal();
-}
-
-async function saveSupabaseConfig() {
-  const url = document.getElementById('sbUrlInput').value.trim();
-  const key = document.getElementById('sbKeyInput').value.trim();
-  const statusMsg = document.getElementById('sbStatusMsg');
-
-  if (!url || !key) {
-    statusMsg.textContent = '모든 필드를 입력해 주세요.';
-    statusMsg.classList.remove('hidden');
-    statusMsg.classList.add('error');
-    return;
-  }
-
-  statusMsg.textContent = '연결 확인 중... (약 2~3초 소요)';
-  statusMsg.classList.remove('error');
-  statusMsg.classList.remove('hidden');
-
-  try {
-    if (!window.supabase) {
-      throw new Error('Supabase SDK가 정상 로드되지 않았습니다.');
-    }
-    const testClient = window.supabase.createClient(url, key);
-    // 테이블 읽기 권한을 테스트하기 위해 간단한 쿼리 전송
-    const { error } = await testClient.from('sv_projects').select('id').limit(1);
-    if (error) throw error;
-
-
-    // 성공 시 LocalStorage 저장 후 리로드
-    localStorage.setItem('supabase_url', url);
-    localStorage.setItem('supabase_key', key);
-    location.reload();
-  } catch (err) {
-    statusMsg.textContent = 'Supabase 연결에 실패했습니다. DB SQL 세팅 및 스토리지 버킷이 올바른지 다시 확인해 주세요. (에러: ' + err.message + ')';
-    statusMsg.classList.add('error');
-    statusMsg.classList.remove('hidden');
-  }
-}
-
-function clearSupabaseConfig() {
-  if (confirm('Supabase 연동을 해제하시겠습니까? 해제 시 로컬 서버 또는 오프라인 모드로 복귀합니다.')) {
-    localStorage.removeItem('supabase_url');
-    localStorage.removeItem('supabase_key');
-    localStorage.removeItem('sb_active_project_id');
-    location.reload();
-  }
-}
 
 /* ------------ 이벤트 바인딩 ------------ */
 function bindEvents() {
