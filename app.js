@@ -369,6 +369,8 @@ async function init() {
 
   if (queryKey) {
     localStorage.setItem('supabase_key', queryKey);
+    // 기존 캐시된 낡은 URL로 인해 연동이 꼬이는 현상 방지를 위해 초기화
+    localStorage.removeItem('supabase_url');
     urlParamsForInit.delete('key');
   }
   if (queryUrl) {
