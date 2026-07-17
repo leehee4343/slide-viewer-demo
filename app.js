@@ -381,24 +381,6 @@ async function init() {
   } else {
     await initLocalOrStaticFallback();
   }
-}
-
-async function initLocalOrStaticFallback() {
-  // 2. 기존 로컬 Node.js 서버 감지 및 실행 (2순위)
-  try {
-    db = LocalServerProvider;
-    const data = await db.getProjects();
-    projects = data.projects;
-    currentProjectId = data.currentProjectId;
-    serverMode = true;
-    console.log("로컬 편집 서버 연동 완료 (로컬 파일 시스템 사용)");
-  } catch (e) {
-    // 3. 정적 보기 전용 모드 폴백 (3순위)
-    initStaticMode();
-  }
-}
-
-
 
   const urlParams = new URLSearchParams(location.search);
   const urlProjectId = urlParams.get('project');
@@ -426,6 +408,22 @@ async function initLocalOrStaticFallback() {
   loadCurrentProjectSlides();
   bindEvents();
 }
+
+async function initLocalOrStaticFallback() {
+  // 2. 기존 로컬 Node.js 서버 감지 및 실행 (2순위)
+  try {
+    db = LocalServerProvider;
+    const data = await db.getProjects();
+    projects = data.projects;
+    currentProjectId = data.currentProjectId;
+    serverMode = true;
+    console.log("로컬 편집 서버 연동 완료 (로컬 파일 시스템 사용)");
+  } catch (e) {
+    // 3. 정적 보기 전용 모드 폴백 (3순위)
+    initStaticMode();
+  }
+}
+
 
 function initStaticMode() {
   db = StaticDataProvider;
