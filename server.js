@@ -98,10 +98,15 @@ function writeManifest(data) {
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(data, null, 2), 'utf-8');
 }
 
+// 순수 함수로 분리 — deploy-demo.js가 .demo-worktree 등 다른 경로에 대해서도
+// 동일한 포맷을 재사용할 수 있도록 경로 의존성 없이 문자열만 생성합니다.
+function buildStaticDataFileContent(manifest) {
+  return `// 자동 생성 파일 — 서버 없이 index.html을 직접 열었을 때 표시되는 슬라이드 목록입니다. 직접 수정하지 마세요.\n// 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.\nwindow.STATIC_PROJECT_DATA = ${JSON.stringify(manifest, null, 2)};\n`;
+}
+
 function regenerateStaticData() {
   const manifest = readManifest();
-  const content = `// 자동 생성 파일 — 서버 없이 index.html을 직접 열었을 때 표시되는 슬라이드 목록입니다. 직접 수정하지 마세요.\n// 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.\nwindow.STATIC_PROJECT_DATA = ${JSON.stringify(manifest, null, 2)};\n`;
-  fs.writeFileSync(STATIC_DATA_PATH, content, 'utf-8');
+  fs.writeFileSync(STATIC_DATA_PATH, buildStaticDataFileContent(manifest), 'utf-8');
 }
 
 function sendJSON(res, status, data) {
@@ -373,11 +378,17 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-ensureSetup();
-server.listen(PORT, () => {
-  const url = `http://localhost:${PORT}/`;
-  console.log(`슬라이드 뷰어 편집 서버 실행 중: ${url}`);
-  console.log('이 창을 닫으면 서버가 종료됩니다. (편집 기능만 서버가 필요하며, 보기는 index.html을 직접 열어도 됩니다)');
-  const opener = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
-  exec(`${opener} ${url}`);
-});
+// deploy-demo.js 등 다른 스크립트가 require()로 함수만 가져다 쓸 때는
+// 서버를 자동으로 띄우지 않도록 직접 실행(node server.js)한 경우에만 시작합니다.
+if (require.main === module) {
+  ensureSetup();
+  server.listen(PORT, () => {
+    const url = `http://localhost:${PORT}/`;
+    console.log(`슬라이드 뷰어 편집 서버 실행 중: ${url}`);
+    console.log('이 창을 닫으면 서버가 종료됩니다. (편집 기능만 서버가 필요하며, 보기는 index.html을 직접 열어도 됩니다)');
+    const opener = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+    exec(`${opener} ${url}`);
+  });
+}
+
+module.exports = { buildStaticDataFileContent, readManifest, writeManifest };
