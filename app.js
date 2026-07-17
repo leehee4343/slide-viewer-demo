@@ -116,7 +116,7 @@ let supabaseClient = null;
 const SupabaseProvider = {
   async getProjects() {
     const { data: dbProjects, error } = await supabaseClient
-      .from('projects')
+      .from('sv_projects')
       .select('*')
       .order('created_at', { ascending: true });
     if (error) throw error;
@@ -127,7 +127,7 @@ const SupabaseProvider = {
       localStorage.setItem('sb_active_project_id', activeId);
     } else if (dbProjects.length === 0) {
       // 프로젝트가 하나도 없으면 강제 초기 생성
-      await supabaseClient.from('projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
+      await supabaseClient.from('sv_projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
       activeId = 'default';
       localStorage.setItem('sb_active_project_id', activeId);
       return this.getProjects(); // 재귀 호출로 다시 정렬된 데이터 반환
@@ -135,7 +135,7 @@ const SupabaseProvider = {
 
     const projectsWithSlides = await Promise.all(dbProjects.map(async p => {
       const { data: dbSlides } = await supabaseClient
-        .from('slides')
+        .from('sv_slides')
         .select('*')
         .eq('project_id', p.id)
         .order('order', { ascending: true });
@@ -165,7 +165,7 @@ const SupabaseProvider = {
   async createProject(name) {
     const id = makeId();
     const { error } = await supabaseClient
-      .from('projects')
+      .from('sv_projects')
       .insert([{ id, name }]);
     if (error) throw error;
     localStorage.setItem('sb_active_project_id', id);
@@ -175,11 +175,11 @@ const SupabaseProvider = {
     // 1. 스토리지 파일들 삭제
     try {
       const { data: files } = await supabaseClient.storage
-        .from('slides')
+        .from('sv_slides_bucket')
         .list(projectId);
       if (files && files.length > 0) {
         const paths = files.map(f => `${projectId}/${f.name}`);
-        await supabaseClient.storage.from('slides').remove(paths);
+        await supabaseClient.storage.from('sv_slides_bucket').remove(paths);
       }
     } catch (e) {
       console.warn("Storage clean up failed during project delete:", e);
@@ -187,18 +187,18 @@ const SupabaseProvider = {
 
     // 2. DB 삭제 (Cascade로 slides 도 자동 삭제됨)
     const { error } = await supabaseClient
-      .from('projects')
+      .from('sv_projects')
       .delete()
       .eq('id', projectId);
     if (error) throw error;
 
     // 활성 프로젝트 갱신
-    const { data: dbProjects } = await supabaseClient.from('projects').select('id');
+    const { data: dbProjects } = await supabaseClient.from('sv_projects').select('id');
     let nextActive = 'default';
     if (dbProjects && dbProjects.length > 0) {
       nextActive = dbProjects[0].id;
     } else {
-      await supabaseClient.from('projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
+      await supabaseClient.from('sv_projects').insert([{ id: 'default', name: '기본 프로젝트' }]);
     }
     localStorage.setItem('sb_active_project_id', nextActive);
     
@@ -206,7 +206,7 @@ const SupabaseProvider = {
   },
   async renameProject(projectId, name) {
     const { error } = await supabaseClient
-      .from('projects')
+      .from('sv_projects')
       .update({ name })
       .eq('id', projectId);
     if (error) throw error;
@@ -214,7 +214,7 @@ const SupabaseProvider = {
   },
   async getSlides(projectId) {
     const { data, error } = await supabaseClient
-      .from('slides')
+      .from('sv_slides')
       .select('*')
       .eq('project_id', projectId)
       .order('order', { ascending: true });
@@ -232,9 +232,9 @@ const SupabaseProvider = {
     const filename = `${id}${ext}`;
     const filePath = `${projectId}/${filename}`;
 
-    // 1. Storage 버킷 'slides'에 업로드
+    // 1. Storage 버킷 'sv_slides_bucket'에 업로드
     const { error: uploadError } = await supabaseClient.storage
-      .from('slides')
+      .from('sv_slides_bucket')
       .upload(filePath, file, {
         contentType: file.type || 'application/octet-stream',
         cacheControl: '3600',
@@ -244,19 +244,19 @@ const SupabaseProvider = {
 
     // 2. Public URL 획득
     const { data: { publicUrl } } = supabaseClient.storage
-      .from('slides')
+      .from('sv_slides_bucket')
       .getPublicUrl(filePath);
 
     // 3. order 순서 결정을 위한 갯수 계산
     const { data: existingSlides } = await supabaseClient
-      .from('slides')
+      .from('sv_slides')
       .select('id')
       .eq('project_id', projectId);
     const nextOrder = existingSlides ? existingSlides.length : 0;
 
     // 4. 데이터베이스 Insert
     const { error: dbError } = await supabaseClient
-      .from('slides')
+      .from('sv_slides')
       .insert([{
         id,
         project_id: projectId,
@@ -271,10 +271,10 @@ const SupabaseProvider = {
   async deleteSlides(projectId) {
     // 1. Storage 버킷 내 프로젝트 폴더 지우기
     try {
-      const { data: files } = await supabaseClient.storage.from('slides').list(projectId);
+      const { data: files } = await supabaseClient.storage.from('sv_slides_bucket').list(projectId);
       if (files && files.length > 0) {
         const paths = files.map(f => `${projectId}/${f.name}`);
-        await supabaseClient.storage.from('slides').remove(paths);
+        await supabaseClient.storage.from('sv_slides_bucket').remove(paths);
       }
     } catch (e) {
       console.warn("Storage files delete failed during clearAll:", e);
@@ -282,7 +282,7 @@ const SupabaseProvider = {
 
     // 2. DB slides 삭제
     const { error } = await supabaseClient
-      .from('slides')
+      .from('sv_slides')
       .delete()
       .eq('project_id', projectId);
     if (error) throw error;
@@ -292,7 +292,7 @@ const SupabaseProvider = {
   async reorderSlides(projectId, pairs) {
     const promises = pairs.map(({ id, order }) => 
       supabaseClient
-        .from('slides')
+        .from('sv_slides')
         .update({ order })
         .eq('id', id)
         .eq('project_id', projectId)
@@ -888,8 +888,9 @@ async function saveSupabaseConfig() {
     }
     const testClient = window.supabase.createClient(url, key);
     // 테이블 읽기 권한을 테스트하기 위해 간단한 쿼리 전송
-    const { error } = await testClient.from('projects').select('id').limit(1);
+    const { error } = await testClient.from('sv_projects').select('id').limit(1);
     if (error) throw error;
+
 
     // 성공 시 LocalStorage 저장 후 리로드
     localStorage.setItem('supabase_url', url);
