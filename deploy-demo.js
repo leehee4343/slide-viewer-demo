@@ -10,7 +10,11 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
+// 콜백 기반 readline은 두 질문 사이(그 사이에 git 작업들이 끼어드는 동안)에
+// 입력이 이미 버퍼링되어 있으면 그 줄을 리스너 없이 그냥 흘려보내버려, 두 번째
+// 질문의 답이 유실되는 문제가 있습니다. readline/promises는 각 question() 호출이
+// 다음 줄을 정확히 기다렸다가 반환하므로 이 문제가 없습니다.
+const readline = require('readline/promises');
 const { buildStaticDataFileContent } = require('./server.js');
 
 const ROOT = __dirname;
@@ -25,11 +29,10 @@ function run(cmd, cwd) {
 function runCapture(cmd, cwd) {
   return execSync(cmd, { cwd: cwd || ROOT }).toString().trim();
 }
-// stdin이 파이프(비-TTY)일 때 질문마다 새 readline.Interface를 만들면 버퍼링된
-// 나머지 입력이 유실될 수 있어, 스크립트 전체에서 인터페이스 하나를 재사용합니다.
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-function ask(question) {
-  return new Promise((resolve) => rl.question(question, (ans) => resolve(ans.trim())));
+async function ask(question) {
+  const ans = await rl.question(question);
+  return ans.trim();
 }
 
 // 이전 실행이 병합 충돌 상태로 중단된 채 남아있는지 확인
