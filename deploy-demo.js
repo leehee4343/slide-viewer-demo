@@ -25,9 +25,11 @@ function run(cmd, cwd) {
 function runCapture(cmd, cwd) {
   return execSync(cmd, { cwd: cwd || ROOT }).toString().trim();
 }
+// stdin이 파이프(비-TTY)일 때 질문마다 새 readline.Interface를 만들면 버퍼링된
+// 나머지 입력이 유실될 수 있어, 스크립트 전체에서 인터페이스 하나를 재사용합니다.
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 function ask(question) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => rl.question(question, (ans) => { rl.close(); resolve(ans.trim()); }));
+  return new Promise((resolve) => rl.question(question, (ans) => resolve(ans.trim())));
 }
 
 // 이전 실행이 병합 충돌 상태로 중단된 채 남아있는지 확인
@@ -173,6 +175,7 @@ async function main() {
   run(`git commit -m "deploy: ${today} 슬라이드 데이터 배포"`, WORKTREE_DIR);
   run('git push demo demo-deploy:main', WORKTREE_DIR);
   console.log(`\n✅ 공개 데모 배포 완료: ${DEMO_URL}`);
+  rl.close();
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => { console.error(e); rl.close(); process.exit(1); });
