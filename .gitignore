@@ -9,3 +9,6 @@ prototype_v1.html
 # OS/편집기 캐시
 Thumbs.db
 .DS_Store
+
+# deploy-demo.js가 사용하는 격리된 배포용 git worktree (공개 데모 브랜치 작업공간)
+.demo-worktree/
