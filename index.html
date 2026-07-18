@@ -23,17 +23,17 @@
           </select>
           <svg class="select-arrow" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <button class="btn border-btn" id="renameProjBtn" onclick="renameCurrentProject()" title="프로젝트 이름 수정">
-          이름 수정
+        <button class="btn border-btn icon-btn" id="addProjBtn" onclick="createNewProject()" title="새 프로젝트 추가">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11v4M10 13h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="btn border-btn icon-btn" id="renameProjBtn" onclick="renameCurrentProject()" title="프로젝트 이름 수정">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="btn border-btn icon-btn danger" id="deleteProjBtn" onclick="deleteCurrentProject()" title="현재 프로젝트 삭제">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M19 7l-.8 12a2 2 0 0 1-2 1.8H7.8a2 2 0 0 1-2-1.8L5 7M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <button class="btn border-btn" id="togglePublicBtn" onclick="toggleCurrentProjectPublic()" title="공개 데모(다른 기기)에서 볼 수 있는지 전환">
           비공개
-        </button>
-        <button class="btn border-btn" id="addProjBtn" onclick="createNewProject()" title="새 프로젝트 추가">
-          프로젝트 추가
-        </button>
-        <button class="btn border-btn danger" id="deleteProjBtn" onclick="deleteCurrentProject()" title="현재 프로젝트 삭제">
-          프로젝트 삭제
         </button>
       </div>
     </div>

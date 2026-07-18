@@ -632,12 +632,25 @@ async function toggleCurrentProjectPublic() {
     : `'${curProj.name}' 프로젝트를 비공개로 전환할까요?\n다른 기기에서 더 이상 이 프로젝트를 볼 수 없게 됩니다.`;
   if (!confirm(msg)) return;
 
+  // 전환 시 Supabase와 이미지/데이터를 동기화하느라 시간이 걸릴 수 있어
+  // (특히 공개로 켤 때 슬라이드 전체를 업로드하므로) 버튼에 진행 중 상태를 표시합니다.
+  if (togglePublicBtn) {
+    togglePublicBtn.disabled = true;
+    togglePublicBtn.classList.add('loading');
+    togglePublicBtn.textContent = goingPublic ? '공개 전환 중...' : '비공개 전환 중...';
+  }
+
   try {
     const data = await db.setProjectPublic(currentProjectId, goingPublic);
     curProj.public = data.project ? data.project.public : goingPublic;
-    updateTogglePublicBtn();
   } catch (e) {
     alert('공개 상태 변경 실패: ' + e.message);
+  } finally {
+    if (togglePublicBtn) {
+      togglePublicBtn.disabled = false;
+      togglePublicBtn.classList.remove('loading');
+    }
+    updateTogglePublicBtn();
   }
 }
 
@@ -953,9 +966,13 @@ async function triggerAddImages() {
 /* ------------ 파일 업로드 — images/ 폴더 혹은 Supabase Storage 에 저장 ------------ */
 async function handleFiles(fileList) {
   if (!serverMode) return;
+  // fileList가 <input type=file>의 실시간 FileList일 경우, 아래 checkPassword()의
+  // await로 제어권이 'change' 이벤트 핸들러로 돌아가는 동안 그쪽에서 fileInput.value를
+  // 비워버려 fileList가 통째로 빈 상태가 되는 경합이 있었습니다. await 전에 먼저
+  // 배열로 스냅샷을 떠서 이후 입력값 초기화와 무관하게 유지되도록 합니다.
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   const ok = await checkPassword();
   if (!ok) return;
-  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   if (files.length === 0) return;
 
   const progressOverlay = document.getElementById('uploadProgressOverlay');
