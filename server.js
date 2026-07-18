@@ -8,6 +8,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const supabaseSync = require('./supabase-sync.js');
 
 const ROOT = __dirname;
 const IMAGES_DIR = path.join(ROOT, 'images');
@@ -27,6 +28,14 @@ const MIME = {
   '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
 };
+
+// 기존 프로젝트에는 public 필드가 없을 수 있으므로 기본값(false, 비공개)을 채워줍니다.
+function normalizeManifest(manifest) {
+  manifest.projects.forEach((p) => {
+    if (typeof p.public !== 'boolean') p.public = false;
+  });
+  return manifest;
+}
 
 function ensureSetup() {
   if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR);
@@ -65,13 +74,15 @@ function ensureSetup() {
         {
           id: "default",
           name: "기본 프로젝트",
+          public: false,
           slides: []
         }
       ]
     };
     writeManifest(manifest);
   }
-  
+
+  normalizeManifest(manifest);
   regenerateStaticData();
 }
 
@@ -80,17 +91,17 @@ function readManifest() {
     const raw = fs.readFileSync(MANIFEST_PATH, 'utf-8');
     const data = JSON.parse(raw);
     if (Array.isArray(data)) {
-      return {
+      return normalizeManifest({
         currentProjectId: "default",
         projects: [{ id: "default", name: "기본 프로젝트", slides: data }]
-      };
+      });
     }
-    return data;
+    return normalizeManifest(data);
   } catch {
-    return {
+    return normalizeManifest({
       currentProjectId: "default",
       projects: [{ id: "default", name: "기본 프로젝트", slides: [] }]
-    };
+    });
   }
 }
 
@@ -107,6 +118,17 @@ function buildStaticDataFileContent(manifest) {
 function regenerateStaticData() {
   const manifest = readManifest();
   fs.writeFileSync(STATIC_DATA_PATH, buildStaticDataFileContent(manifest), 'utf-8');
+}
+
+// proj.public이 true일 때만 Supabase에 반영합니다. 동기화가 실패해도 로컬 작업은
+// 이미 성공적으로 끝난 뒤이므로, 여기서는 경고만 남기고 API 응답에는 영향을 주지 않습니다.
+async function syncIfPublic(proj) {
+  if (!proj || !proj.public) return;
+  try {
+    await supabaseSync.syncProject(proj, ROOT);
+  } catch (e) {
+    console.warn(`Supabase 동기화 실패 (project=${proj.id}):`, e.message);
+  }
 }
 
 function sendJSON(res, status, data) {
@@ -181,7 +203,13 @@ const server = http.createServer(async (req, res) => {
       if (idx === -1) { res.writeHead(404); return res.end('project not found'); }
       
       const targetProj = manifest.projects[idx];
-      
+
+      // 공개 상태였다면 Supabase 쪽 데이터도 함께 정리합니다.
+      if (targetProj.public) {
+        try { await supabaseSync.removeProject(projectId); }
+        catch (e) { console.warn(`Supabase 프로젝트 삭제 동기화 실패 (project=${projectId}):`, e.message); }
+      }
+
       // 1. 해당 프로젝트 슬라이드들의 이미지 물리 파일들 삭제
       targetProj.slides.forEach(s => {
         const imgPath = path.join(ROOT, s.file);
@@ -242,9 +270,34 @@ const server = http.createServer(async (req, res) => {
       if (!proj) return sendJSON(res, 404, { error: 'project not found' });
       
       proj.name = newName;
-      
+
       writeManifest(manifest);
       regenerateStaticData();
+      await syncIfPublic(proj);
+      return sendJSON(res, 200, { ok: true, project: proj });
+    }
+
+    if (pathname === '/api/projects/public' && req.method === 'PUT') {
+      if (!verifyPassword(req, res)) return;
+      const projectId = u.searchParams.get('projectId');
+      const makePublic = u.searchParams.get('public') === 'true';
+      if (!projectId) { res.writeHead(400); return res.end('missing projectId'); }
+
+      const manifest = readManifest();
+      const proj = manifest.projects.find(p => p.id === projectId);
+      if (!proj) return sendJSON(res, 404, { error: 'project not found' });
+
+      proj.public = makePublic;
+      writeManifest(manifest);
+      regenerateStaticData();
+
+      try {
+        if (makePublic) await supabaseSync.syncProject(proj, ROOT);
+        else await supabaseSync.removeProject(projectId);
+      } catch (e) {
+        return sendJSON(res, 502, { error: 'sync_failed', message: `공개 상태는 저장됐지만 Supabase 동기화에 실패했습니다: ${e.message}` });
+      }
+
       return sendJSON(res, 200, { ok: true, project: proj });
     }
 
@@ -282,9 +335,10 @@ const server = http.createServer(async (req, res) => {
       
       const slide = { id, name, file: relativeFilePath, order: proj.slides.length };
       proj.slides.push(slide);
-      
+
       writeManifest(manifest);
       regenerateStaticData();
+      await syncIfPublic(proj);
       return sendJSON(res, 200, slide);
     }
 
@@ -294,19 +348,20 @@ const server = http.createServer(async (req, res) => {
       const projectId = u.searchParams.get('projectId') || manifest.currentProjectId;
       const proj = manifest.projects.find(p => p.id === projectId);
       if (!proj) return sendJSON(res, 404, { error: 'project not found' });
-      
+
       proj.slides.forEach((s) => {
         const imgPath = path.join(ROOT, s.file);
         if (fs.existsSync(imgPath)) {
           try { fs.unlinkSync(imgPath); } catch(e) {}
         }
       });
-      
+
       const deletedCount = proj.slides.length;
       proj.slides = [];
-      
+
       writeManifest(manifest);
       regenerateStaticData();
+      await syncIfPublic(proj);
       return sendJSON(res, 200, { ok: true, deleted: deletedCount });
     }
 
@@ -340,6 +395,7 @@ const server = http.createServer(async (req, res) => {
 
       writeManifest(manifest);
       regenerateStaticData();
+      await syncIfPublic(proj);
       return sendJSON(res, 200, { ok: true });
     }
 
@@ -361,6 +417,7 @@ const server = http.createServer(async (req, res) => {
       
       writeManifest(manifest);
       regenerateStaticData();
+      await syncIfPublic(proj);
       return sendJSON(res, 200, { ok: true });
     }
 

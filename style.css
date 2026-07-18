@@ -704,6 +704,12 @@ body{
   color: #a8b2d1;
 }
 
+.btn.border-btn.public-on {
+  border-color: var(--amber);
+  color: var(--amber-md);
+  background: rgba(245, 135, 10, 0.12);
+}
+
 .btn.border-btn.danger:hover {
   background: rgba(239, 68, 68, 0.15);
   border-color: #ef4444;
