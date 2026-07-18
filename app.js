@@ -632,12 +632,25 @@ async function toggleCurrentProjectPublic() {
     : `'${curProj.name}' 프로젝트를 비공개로 전환할까요?\n다른 기기에서 더 이상 이 프로젝트를 볼 수 없게 됩니다.`;
   if (!confirm(msg)) return;
 
+  // 전환 시 Supabase와 이미지/데이터를 동기화하느라 시간이 걸릴 수 있어
+  // (특히 공개로 켤 때 슬라이드 전체를 업로드하므로) 버튼에 진행 중 상태를 표시합니다.
+  if (togglePublicBtn) {
+    togglePublicBtn.disabled = true;
+    togglePublicBtn.classList.add('loading');
+    togglePublicBtn.textContent = goingPublic ? '공개 전환 중...' : '비공개 전환 중...';
+  }
+
   try {
     const data = await db.setProjectPublic(currentProjectId, goingPublic);
     curProj.public = data.project ? data.project.public : goingPublic;
-    updateTogglePublicBtn();
   } catch (e) {
     alert('공개 상태 변경 실패: ' + e.message);
+  } finally {
+    if (togglePublicBtn) {
+      togglePublicBtn.disabled = false;
+      togglePublicBtn.classList.remove('loading');
+    }
+    updateTogglePublicBtn();
   }
 }
 
