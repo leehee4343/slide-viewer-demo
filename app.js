@@ -953,9 +953,13 @@ async function triggerAddImages() {
 /* ------------ 파일 업로드 — images/ 폴더 혹은 Supabase Storage 에 저장 ------------ */
 async function handleFiles(fileList) {
   if (!serverMode) return;
+  // fileList가 <input type=file>의 실시간 FileList일 경우, 아래 checkPassword()의
+  // await로 제어권이 'change' 이벤트 핸들러로 돌아가는 동안 그쪽에서 fileInput.value를
+  // 비워버려 fileList가 통째로 빈 상태가 되는 경합이 있었습니다. await 전에 먼저
+  // 배열로 스냅샷을 떠서 이후 입력값 초기화와 무관하게 유지되도록 합니다.
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   const ok = await checkPassword();
   if (!ok) return;
-  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
   if (files.length === 0) return;
 
   const progressOverlay = document.getElementById('uploadProgressOverlay');
