@@ -1,11 +1,17 @@
 // 자동 생성 파일 — 서버 없이 index.html을 직접 열었을 때 표시되는 슬라이드 목록입니다. 직접 수정하지 마세요.
 // 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.
 window.STATIC_PROJECT_DATA = {
-  "currentProjectId": "mrqeuxndln1ucp",
+  "currentProjectId": "default",
   "projects": [
     {
+      "id": "default",
+      "name": "기본 프로젝트",
+      "slides": [],
+      "public": false
+    },
+    {
       "id": "mrqeuxndln1ucp",
-      "name": "백투더스쿨 사업계획서 요약본(CahtGPT)",
+      "name": "02. 백투더스쿨 사업계획서 요약본(CahtGPT)",
       "slides": [
         {
           "id": "mrqfge6r525og2",
@@ -108,7 +114,7 @@ window.STATIC_PROJECT_DATA = {
     },
     {
       "id": "mrqfrxbyk82lwo",
-      "name": "백투더스쿨 사업계획서(Full)",
+      "name": "01. 백투더스쿨 사업계획서(Full)",
       "slides": [
         {
           "id": "mrqfsazeu6kn2f",
@@ -649,6 +655,212 @@ window.STATIC_PROJECT_DATA = {
           "name": "슬라이드#90",
           "file": "images/mrqfrxbyk82lwo/mrqfscwu23bt63.png",
           "order": 89
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "mrqhtp7ecep4t5",
+      "name": "03. 백투더스쿨 사업계획서 요약본(Gemini)",
+      "slides": [
+        {
+          "id": "mrqhu13tktc6u9",
+          "name": "slide_01",
+          "file": "images/mrqhtp7ecep4t5/mrqhu13tktc6u9.png",
+          "order": 0
+        },
+        {
+          "id": "mrqhu14hc1d66l",
+          "name": "slide_02",
+          "file": "images/mrqhtp7ecep4t5/mrqhu14hc1d66l.png",
+          "order": 1
+        },
+        {
+          "id": "mrqhu154qsbzoy",
+          "name": "slide_03",
+          "file": "images/mrqhtp7ecep4t5/mrqhu154qsbzoy.png",
+          "order": 2
+        },
+        {
+          "id": "mrqhu15pfoefay",
+          "name": "slide_04",
+          "file": "images/mrqhtp7ecep4t5/mrqhu15pfoefay.png",
+          "order": 3
+        },
+        {
+          "id": "mrqhu16cp2qvnb",
+          "name": "slide_05",
+          "file": "images/mrqhtp7ecep4t5/mrqhu16cp2qvnb.png",
+          "order": 4
+        },
+        {
+          "id": "mrqhu172qih9gs",
+          "name": "slide_06",
+          "file": "images/mrqhtp7ecep4t5/mrqhu172qih9gs.png",
+          "order": 5
+        },
+        {
+          "id": "mrqhu17n349m4g",
+          "name": "slide_07",
+          "file": "images/mrqhtp7ecep4t5/mrqhu17n349m4g.png",
+          "order": 6
+        },
+        {
+          "id": "mrqhu185af8e2b",
+          "name": "slide_08",
+          "file": "images/mrqhtp7ecep4t5/mrqhu185af8e2b.png",
+          "order": 7
+        },
+        {
+          "id": "mrqhu18qopj61m",
+          "name": "slide_09",
+          "file": "images/mrqhtp7ecep4t5/mrqhu18qopj61m.png",
+          "order": 8
+        },
+        {
+          "id": "mrqhu19h5t0kon",
+          "name": "slide_10",
+          "file": "images/mrqhtp7ecep4t5/mrqhu19h5t0kon.png",
+          "order": 9
+        },
+        {
+          "id": "mrqhu1a51742xj",
+          "name": "slide_11",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1a51742xj.png",
+          "order": 10
+        },
+        {
+          "id": "mrqhu1auzlvoqe",
+          "name": "slide_12",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1auzlvoqe.png",
+          "order": 11
+        },
+        {
+          "id": "mrqhu1bgqfn0p6",
+          "name": "slide_13",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1bgqfn0p6.png",
+          "order": 12
+        },
+        {
+          "id": "mrqhu1c4y36mcm",
+          "name": "slide_14",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1c4y36mcm.png",
+          "order": 13
+        },
+        {
+          "id": "mrqhu1cozzusqb",
+          "name": "slide_15",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1cozzusqb.png",
+          "order": 14
+        },
+        {
+          "id": "mrqhu1dbkc952u",
+          "name": "slide_16",
+          "file": "images/mrqhtp7ecep4t5/mrqhu1dbkc952u.png",
+          "order": 15
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "mrqir1gc71arfr",
+      "name": "04. 백투더스쿨 사업계획서 요약본(Claude)",
+      "slides": [
+        {
+          "id": "mrqircs78hzmfy",
+          "name": "Slide_01_재회의_첫_장면",
+          "file": "images/mrqir1gc71arfr/mrqircs78hzmfy.png",
+          "order": 0
+        },
+        {
+          "id": "mrqircsmlt7j2u",
+          "name": "Slide_02_연결은_많아졌지만_오래된_친구는_멀어졌습니다",
+          "file": "images/mrqir1gc71arfr/mrqircsmlt7j2u.png",
+          "order": 1
+        },
+        {
+          "id": "mrqirct14j4fy4",
+          "name": "Slide_03_기존_서비스와_다른_관계의_방향",
+          "file": "images/mrqir1gc71arfr/mrqirct14j4fy4.png",
+          "order": 2
+        },
+        {
+          "id": "mrqirctg1o9z1o",
+          "name": "Slide_04_질문의_전환",
+          "file": "images/mrqir1gc71arfr/mrqirctg1o9z1o.png",
+          "order": 3
+        },
+        {
+          "id": "mrqirctuefxhnn",
+          "name": "Slide_05_서비스_개요",
+          "file": "images/mrqir1gc71arfr/mrqirctuefxhnn.png",
+          "order": 4
+        },
+        {
+          "id": "mrqircu49jeu0e",
+          "name": "Slide_06_왜_지금_가능한가",
+          "file": "images/mrqir1gc71arfr/mrqircu49jeu0e.png",
+          "order": 5
+        },
+        {
+          "id": "mrqircujl5544f",
+          "name": "Slide_07_사용자_서비스_소개",
+          "file": "images/mrqir1gc71arfr/mrqircujl5544f.png",
+          "order": 6
+        },
+        {
+          "id": "mrqircuwk94783",
+          "name": "Slide_08_운영_관리_시스템",
+          "file": "images/mrqir1gc71arfr/mrqircuwk94783.png",
+          "order": 7
+        },
+        {
+          "id": "mrqircv9ts09y8",
+          "name": "Slide_09_동창_네트워크의_사업_확장성",
+          "file": "images/mrqir1gc71arfr/mrqircv9ts09y8.png",
+          "order": 8
+        },
+        {
+          "id": "mrqircvk7xo0nx",
+          "name": "Slide_10_투자와_초기_네트워크_구축",
+          "file": "images/mrqir1gc71arfr/mrqircvk7xo0nx.png",
+          "order": 9
+        },
+        {
+          "id": "mrqircw5vv4o76",
+          "name": "Slide_11_네트워크_성장_전략",
+          "file": "images/mrqir1gc71arfr/mrqircw5vv4o76.png",
+          "order": 10
+        },
+        {
+          "id": "mrqircwlfvixqy",
+          "name": "Slide_12_지속_성장_구조",
+          "file": "images/mrqir1gc71arfr/mrqircwlfvixqy.png",
+          "order": 11
+        },
+        {
+          "id": "mrqircwy4g8uqv",
+          "name": "Slide_13_신뢰_네트워크의_가치",
+          "file": "images/mrqir1gc71arfr/mrqircwy4g8uqv.png",
+          "order": 12
+        },
+        {
+          "id": "mrqircxaq3o1pg",
+          "name": "Slide_14_사업_확장_전략",
+          "file": "images/mrqir1gc71arfr/mrqircxaq3o1pg.png",
+          "order": 13
+        },
+        {
+          "id": "mrqircxnt5k01p",
+          "name": "Slide_15_서비스_구축_철학",
+          "file": "images/mrqir1gc71arfr/mrqircxnt5k01p.png",
+          "order": 14
+        },
+        {
+          "id": "mrqircxymaoxhz",
+          "name": "Slide_16_Closing",
+          "file": "images/mrqir1gc71arfr/mrqircxymaoxhz.png",
+          "order": 15
         }
       ],
       "public": true
