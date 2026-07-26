@@ -1,17 +1,11 @@
 // 자동 생성 파일 — 서버 없이 index.html을 직접 열었을 때 표시되는 슬라이드 목록입니다. 직접 수정하지 마세요.
 // 이미지를 추가·순서변경하려면 '프로그램 시작.bat'으로 편집 서버를 켠 뒤 브라우저에서 사용하세요.
 window.STATIC_PROJECT_DATA = {
-  "currentProjectId": "default",
+  "currentProjectId": "mrqeuxndln1ucp",
   "projects": [
     {
-      "id": "default",
-      "name": "기본 프로젝트",
-      "slides": [],
-      "public": false
-    },
-    {
       "id": "mrqeuxndln1ucp",
-      "name": "02. 백투더스쿨 사업계획서 요약본(CahtGPT)",
+      "name": "20260716_백투더스쿨 사업계획서 요약본(CahtGPT)",
       "slides": [
         {
           "id": "mrqfge6r525og2",
@@ -114,7 +108,7 @@ window.STATIC_PROJECT_DATA = {
     },
     {
       "id": "mrqfrxbyk82lwo",
-      "name": "01. 백투더스쿨 사업계획서(Full)",
+      "name": "20260715_백투더스쿨 사업계획서(Full)",
       "slides": [
         {
           "id": "mrqfsazeu6kn2f",
@@ -661,7 +655,7 @@ window.STATIC_PROJECT_DATA = {
     },
     {
       "id": "mrqhtp7ecep4t5",
-      "name": "03. 백투더스쿨 사업계획서 요약본(Gemini)",
+      "name": "20260716_백투더스쿨 사업계획서 요약본(Gemini)",
       "slides": [
         {
           "id": "mrqhu13tktc6u9",
@@ -764,7 +758,7 @@ window.STATIC_PROJECT_DATA = {
     },
     {
       "id": "mrqir1gc71arfr",
-      "name": "04. 백투더스쿨 사업계획서 요약본(Claude)",
+      "name": "20260716_백투더스쿨 사업계획서 요약본(Claude)",
       "slides": [
         {
           "id": "mrqircs78hzmfy",
@@ -861,6 +855,121 @@ window.STATIC_PROJECT_DATA = {
           "name": "Slide_16_Closing",
           "file": "images/mrqir1gc71arfr/mrqircxymaoxhz.png",
           "order": 15
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "mrya2dtds7vg24",
+      "name": "20260725_해양레저체험복합센터(사업안내서)",
+      "slides": [
+        {
+          "id": "mrzkasc3eh3kgo",
+          "name": "Slide01",
+          "file": "images/mrya2dtds7vg24/mrzkasc3eh3kgo.png",
+          "order": 0
+        },
+        {
+          "id": "mrzkascywb2hq0",
+          "name": "Slide02",
+          "file": "images/mrya2dtds7vg24/mrzkascywb2hq0.png",
+          "order": 1
+        },
+        {
+          "id": "mrzkasdtihvc4e",
+          "name": "Slide03",
+          "file": "images/mrya2dtds7vg24/mrzkasdtihvc4e.png",
+          "order": 2
+        },
+        {
+          "id": "mrzkasenjuh25e",
+          "name": "Slide04",
+          "file": "images/mrya2dtds7vg24/mrzkasenjuh25e.png",
+          "order": 3
+        },
+        {
+          "id": "mrzkasfcr49rlr",
+          "name": "Slide05",
+          "file": "images/mrya2dtds7vg24/mrzkasfcr49rlr.png",
+          "order": 4
+        },
+        {
+          "id": "mrzkasg16df3to",
+          "name": "Slide06",
+          "file": "images/mrya2dtds7vg24/mrzkasg16df3to.png",
+          "order": 5
+        },
+        {
+          "id": "mrzkasgre8umr7",
+          "name": "Slide07",
+          "file": "images/mrya2dtds7vg24/mrzkasgre8umr7.png",
+          "order": 6
+        },
+        {
+          "id": "mrzkashgihmiq0",
+          "name": "Slide08",
+          "file": "images/mrya2dtds7vg24/mrzkashgihmiq0.png",
+          "order": 7
+        },
+        {
+          "id": "mrzkasi5buv2hw",
+          "name": "Slide09",
+          "file": "images/mrya2dtds7vg24/mrzkasi5buv2hw.png",
+          "order": 8
+        },
+        {
+          "id": "mrzkasiyght9ip",
+          "name": "Slide10",
+          "file": "images/mrya2dtds7vg24/mrzkasiyght9ip.png",
+          "order": 9
+        },
+        {
+          "id": "mrzkasjlybej6v",
+          "name": "Slide11",
+          "file": "images/mrya2dtds7vg24/mrzkasjlybej6v.png",
+          "order": 10
+        },
+        {
+          "id": "mrzkaskbsxogb8",
+          "name": "Slide12",
+          "file": "images/mrya2dtds7vg24/mrzkaskbsxogb8.png",
+          "order": 11
+        },
+        {
+          "id": "mrzkasl1yk0yl7",
+          "name": "Slide13",
+          "file": "images/mrya2dtds7vg24/mrzkasl1yk0yl7.png",
+          "order": 12
+        },
+        {
+          "id": "mrzkaslmzvk4gp",
+          "name": "Slide14",
+          "file": "images/mrya2dtds7vg24/mrzkaslmzvk4gp.png",
+          "order": 13
+        },
+        {
+          "id": "mrzkasmbdldu12",
+          "name": "Slide15",
+          "file": "images/mrya2dtds7vg24/mrzkasmbdldu12.png",
+          "order": 14
+        },
+        {
+          "id": "mrzkasn3fwotaw",
+          "name": "Slide16",
+          "file": "images/mrya2dtds7vg24/mrzkasn3fwotaw.png",
+          "order": 15
+        },
+        {
+          "id": "mrzkasnugo2aes",
+          "name": "Slide17",
+          "file": "images/mrya2dtds7vg24/mrzkasnugo2aes.png",
+          "order": 16
+        },
+        {
+          "id": "mrzkasopd80whm",
+          "name": "Slide18",
+          "file": "images/mrya2dtds7vg24/mrzkasopd80whm.png",
+          "order": 17
         }
       ],
       "public": true
