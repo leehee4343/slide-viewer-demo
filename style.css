@@ -83,7 +83,11 @@ body{
   border:1px solid var(--line); overflow:hidden;
 }
 .stage.drag{outline:3px dashed var(--blue); outline-offset:-6px; background:var(--blue-lt);}
-.stage img{max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; pointer-events:none;}
+.stage img{
+  max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; pointer-events:none;
+  transform-origin: center center;
+  transition: transform 0.15s ease-out;
+}
 .empty{display:flex; flex-direction:column; align-items:center; gap:14px; color:var(--sub); text-align:center;}
 .empty .ic{width:64px; height:64px; opacity:.5;}
 .empty b{color:var(--text); font-size:17px;}
@@ -113,6 +117,17 @@ body{
 }
 .stage-btn:hover{background:var(--blue);}
 .stage-btn svg{width:16px; height:16px;}
+
+/* 줌 배율 텍스트 버튼 스타일 */
+.stage-btn.zoom-val {
+  width: auto;
+  min-width: 48px;
+  padding: 0 10px;
+  border-radius: 17px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
 /* ---------- 썸네일 스트립 ---------- */
 .thumb-toggle{
   flex-shrink:0; height:18px; background:var(--bg2); border-top:1px solid var(--line);
