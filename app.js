@@ -35,6 +35,14 @@ let mode = 'slide';
 let dragSrcIndex = null;
 let serverMode = false; // 편집 가능 상태 여부 (로컬 Node 서버 연결 시에만 true, Supabase는 항상 보기 전용)
 
+// 줌 및 드래그 이동(Pan) 상태
+let zoomScale = 1.0;
+let panX = 0;
+let panY = 0;
+let isPanning = false;
+let startX = 0;
+let startY = 0;
+
 const stage = document.getElementById('stage');
 const thumbStrip = document.getElementById('thumbStrip');
 const gridGrid = document.getElementById('gridGrid');
@@ -501,8 +509,10 @@ function initStaticMode() {
 
 function renderProjectSelect() {
   if (!projectSelect) return;
-  projectSelect.innerHTML = projects.map(p => {
-    if (!p) return '';
+  const sortedProjects = [...projects].filter(Boolean).sort((a, b) =>
+    (b.name || '이름없음').localeCompare(a.name || '이름없음', 'ko')
+  );
+  projectSelect.innerHTML = sortedProjects.map(p => {
     const name = p.name || '이름없음';
     const id = p.id || '';
     return `<option value="${id}">${name}</option>`;
@@ -526,6 +536,7 @@ function loadCurrentProjectSlides() {
   const curProj = projects.find(p => p.id === currentProjectId);
   slides = curProj ? curProj.slides.slice().sort((a, b) => a.order - b.order) : [];
   current = 0;
+  resetZoomState();
   renderAll();
 }
 
@@ -691,6 +702,15 @@ function renderStage() {
     <div class="counter-tag">${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}</div>
     <div class="stage-actions">
       ${deleteBtnHtml}
+      <button class="stage-btn" onclick="adjustZoom(-0.1)" title="축소 (-)">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
+      <button class="stage-btn zoom-val" onclick="resetZoom()" title="기본 크기 (0)">
+        ${Math.round(zoomScale * 100)}%
+      </button>
+      <button class="stage-btn" onclick="adjustZoom(0.1)" title="확대 (+)">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
       <button class="stage-btn" onclick="toggleFullscreen()" title="${fsTitle}">
         ${fsIcon}
       </button>
@@ -705,6 +725,7 @@ function renderStage() {
   `;
   prevBtn.classList.toggle('disabled', current === 0);
   nextBtn.classList.toggle('disabled', current === slides.length - 1);
+  applyZoom();
 }
 
 function renderThumbs() {
@@ -831,16 +852,19 @@ function openCurrentSlideNewWindow() {
 function go(delta) {
   if (slides.length === 0) return;
   current = Math.min(Math.max(current + delta, 0), slides.length - 1);
+  resetZoomState();
   renderStage();
   renderThumbs();
 }
 function jump(i) {
   current = i;
+  resetZoomState();
   renderStage();
   renderThumbs();
 }
 function jumpFromGrid(i) {
   current = i;
+  resetZoomState();
   setMode('slide');
 }
 
@@ -918,7 +942,7 @@ async function deleteCurrentSlide() {
     if (current >= slides.length) {
       current = Math.max(0, slides.length - 1);
     }
-    
+    resetZoomState();
     renderAll();
   } catch (e) {
     alert('슬라이드 삭제 실패: ' + e.message);
@@ -949,10 +973,55 @@ async function deleteGridSlide(index, slideId, event) {
     if (current >= slides.length) {
       current = Math.max(0, slides.length - 1);
     }
-    
+    resetZoomState();
     renderAll();
   } catch (e) {
     alert('슬라이드 삭제 실패: ' + e.message);
+  }
+}
+
+/* ------------ 확대 / 축소 (Zoom) 및 이동 (Pan) 제어 ------------ */
+function resetZoomState() {
+  zoomScale = 1.0;
+  panX = 0;
+  panY = 0;
+  applyZoom();
+}
+
+function adjustZoom(delta) {
+  zoomScale = Math.min(Math.max(zoomScale + delta, 0.5), 3.0);
+  if (zoomScale <= 1.0) {
+    panX = 0;
+    panY = 0;
+  }
+  applyZoom();
+  updateZoomUI();
+}
+
+function resetZoom() {
+  resetZoomState();
+  updateZoomUI();
+}
+
+function applyZoom() {
+  const img = stage.querySelector('img');
+  if (img) {
+    img.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+    img.style.transition = isPanning ? 'none' : 'transform 0.15s ease-out';
+  }
+  if (stage) {
+    if (zoomScale > 1.0) {
+      stage.style.cursor = isPanning ? 'grabbing' : 'grab';
+    } else {
+      stage.style.cursor = '';
+    }
+  }
+}
+
+function updateZoomUI() {
+  const zoomValEl = document.querySelector('.zoom-val');
+  if (zoomValEl) {
+    zoomValEl.textContent = `${Math.round(zoomScale * 100)}%`;
   }
 }
 
@@ -1091,6 +1160,9 @@ function bindEvents() {
     if (mode !== 'slide') return;
     if (e.key === 'ArrowRight') go(1);
     if (e.key === 'ArrowLeft') go(-1);
+    if (e.key === '+' || e.key === '=') { adjustZoom(0.1); e.preventDefault(); }
+    if (e.key === '-') { adjustZoom(-0.1); e.preventDefault(); }
+    if (e.key === '0') { resetZoom(); e.preventDefault(); }
     if (e.key === 'Escape') {
       const elem = document.getElementById('slideMode');
       if (elem.classList.contains('fallback-fullscreen')) {
@@ -1123,6 +1195,36 @@ function bindEvents() {
   });
   stage.addEventListener('drop', (e) => {
     if (e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  });
+
+  // Panning (드래그 이동) 마우스 이벤트 바인딩
+  stage.addEventListener('mousedown', (e) => {
+    if (zoomScale <= 1.0) return;
+    if (e.button !== 0) return; // 왼쪽 마우스 클릭만 허용
+    const img = stage.querySelector('img');
+    if (!img) return;
+    
+    isPanning = true;
+    startX = e.clientX - panX;
+    startY = e.clientY - panY;
+    img.style.transition = 'none';
+    stage.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isPanning) return;
+    panX = e.clientX - startX;
+    panY = e.clientY - startY;
+    applyZoom();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isPanning) {
+      isPanning = false;
+      stage.style.cursor = '';
+      applyZoom();
+    }
   });
 }
 
