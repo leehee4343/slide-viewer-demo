@@ -973,6 +973,648 @@ window.STATIC_PROJECT_DATA = {
         }
       ],
       "public": true
+    },
+    {
+      "id": "ms2mhei2cpr1bs",
+      "name": "20260727_해양레저체험복합센터(프로그램 소개)",
+      "slides": [
+        {
+          "id": "ms2mibwbscrf5g",
+          "name": "Slide01",
+          "file": "images/ms2mhei2cpr1bs/ms2mibwbscrf5g.png",
+          "order": 0
+        },
+        {
+          "id": "ms2mibx4p57yev",
+          "name": "Slide02",
+          "file": "images/ms2mhei2cpr1bs/ms2mibx4p57yev.png",
+          "order": 1
+        },
+        {
+          "id": "ms2mibxwexa7kq",
+          "name": "Slide03",
+          "file": "images/ms2mhei2cpr1bs/ms2mibxwexa7kq.png",
+          "order": 2
+        },
+        {
+          "id": "ms2mibymoznv58",
+          "name": "Slide04",
+          "file": "images/ms2mhei2cpr1bs/ms2mibymoznv58.png",
+          "order": 3
+        },
+        {
+          "id": "ms2mibzcbt9uqv",
+          "name": "Slide05",
+          "file": "images/ms2mhei2cpr1bs/ms2mibzcbt9uqv.png",
+          "order": 4
+        },
+        {
+          "id": "ms2mibzxci8fgu",
+          "name": "Slide06",
+          "file": "images/ms2mhei2cpr1bs/ms2mibzxci8fgu.png",
+          "order": 5
+        },
+        {
+          "id": "ms2mic0mxsiuf9",
+          "name": "Slide07",
+          "file": "images/ms2mhei2cpr1bs/ms2mic0mxsiuf9.png",
+          "order": 6
+        },
+        {
+          "id": "ms2mic17d4fbcl",
+          "name": "Slide08",
+          "file": "images/ms2mhei2cpr1bs/ms2mic17d4fbcl.png",
+          "order": 7
+        },
+        {
+          "id": "ms2mic1s3m7whi",
+          "name": "Slide09",
+          "file": "images/ms2mhei2cpr1bs/ms2mic1s3m7whi.png",
+          "order": 8
+        },
+        {
+          "id": "ms2mic2dl0vx4j",
+          "name": "Slide10",
+          "file": "images/ms2mhei2cpr1bs/ms2mic2dl0vx4j.png",
+          "order": 9
+        },
+        {
+          "id": "ms2mic2zdizq8g",
+          "name": "Slide11",
+          "file": "images/ms2mhei2cpr1bs/ms2mic2zdizq8g.png",
+          "order": 10
+        },
+        {
+          "id": "ms2mic3l7ryfrt",
+          "name": "Slide12",
+          "file": "images/ms2mhei2cpr1bs/ms2mic3l7ryfrt.png",
+          "order": 11
+        },
+        {
+          "id": "ms2mic45chy5bb",
+          "name": "Slide13",
+          "file": "images/ms2mhei2cpr1bs/ms2mic45chy5bb.png",
+          "order": 12
+        },
+        {
+          "id": "ms2mic4q860snb",
+          "name": "Slide14",
+          "file": "images/ms2mhei2cpr1bs/ms2mic4q860snb.png",
+          "order": 13
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "ms87xqgtr78zqd",
+      "name": "20260731_돼지거래가격 조사시스템(설명회)",
+      "slides": [
+        {
+          "id": "ms87xz86cze0al",
+          "name": "Slide#01",
+          "file": "images/ms87xqgtr78zqd/ms87xz86cze0al.png",
+          "order": 0
+        },
+        {
+          "id": "ms87xz8vznimfg",
+          "name": "Slide#02",
+          "file": "images/ms87xqgtr78zqd/ms87xz8vznimfg.png",
+          "order": 1
+        },
+        {
+          "id": "ms87xz9n7tdy12",
+          "name": "Slide#03",
+          "file": "images/ms87xqgtr78zqd/ms87xz9n7tdy12.png",
+          "order": 2
+        },
+        {
+          "id": "ms87xzagrjky8b",
+          "name": "Slide#04",
+          "file": "images/ms87xqgtr78zqd/ms87xzagrjky8b.png",
+          "order": 3
+        },
+        {
+          "id": "ms87xzbb7uo4qn",
+          "name": "Slide#05",
+          "file": "images/ms87xqgtr78zqd/ms87xzbb7uo4qn.png",
+          "order": 4
+        },
+        {
+          "id": "ms87xzby10v6h7",
+          "name": "Slide#06",
+          "file": "images/ms87xqgtr78zqd/ms87xzby10v6h7.png",
+          "order": 5
+        },
+        {
+          "id": "ms87xzcohpf9su",
+          "name": "Slide#07",
+          "file": "images/ms87xqgtr78zqd/ms87xzcohpf9su.png",
+          "order": 6
+        },
+        {
+          "id": "ms87xzd98giwdy",
+          "name": "Slide#08",
+          "file": "images/ms87xqgtr78zqd/ms87xzd98giwdy.png",
+          "order": 7
+        },
+        {
+          "id": "ms87xzdxsqj646",
+          "name": "Slide#09",
+          "file": "images/ms87xqgtr78zqd/ms87xzdxsqj646.png",
+          "order": 8
+        },
+        {
+          "id": "ms87xzekti4krm",
+          "name": "Slide#10",
+          "file": "images/ms87xqgtr78zqd/ms87xzekti4krm.png",
+          "order": 9
+        },
+        {
+          "id": "ms87xzf9jbhdit",
+          "name": "Slide#11",
+          "file": "images/ms87xqgtr78zqd/ms87xzf9jbhdit.png",
+          "order": 10
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "ms8bhzbgafhpw3",
+      "name": "20260731_돼지거래가격 조사시스템(설명회_주관기관)",
+      "slides": [
+        {
+          "id": "ms8bi6s7q93t0a",
+          "name": "Slide#01",
+          "file": "images/ms8bhzbgafhpw3/ms8bi6s7q93t0a.png",
+          "order": 0
+        },
+        {
+          "id": "ms8bi6t14hhsg4",
+          "name": "Slide#02",
+          "file": "images/ms8bhzbgafhpw3/ms8bi6t14hhsg4.png",
+          "order": 1
+        },
+        {
+          "id": "ms8bi6tyu8dm7c",
+          "name": "Slide#03",
+          "file": "images/ms8bhzbgafhpw3/ms8bi6tyu8dm7c.png",
+          "order": 2
+        },
+        {
+          "id": "ms8bi6uu8xpruq",
+          "name": "Slide#04",
+          "file": "images/ms8bhzbgafhpw3/ms8bi6uu8xpruq.png",
+          "order": 3
+        },
+        {
+          "id": "ms8bi6vq26ossv",
+          "name": "Slide#05",
+          "file": "images/ms8bhzbgafhpw3/ms8bi6vq26ossv.png",
+          "order": 4
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "mscki078n74ofx",
+      "name": "20260803_해양레저체험복합센터(2부)",
+      "slides": [
+        {
+          "id": "msdbdle7z8bfb1",
+          "name": "Slide01",
+          "file": "images/mscki078n74ofx/msdbdle7z8bfb1.png",
+          "order": 0
+        },
+        {
+          "id": "msdbdmb7tjnoc6",
+          "name": "Slide02",
+          "file": "images/mscki078n74ofx/msdbdmb7tjnoc6.png",
+          "order": 1
+        },
+        {
+          "id": "msdbdmtvlapo2q",
+          "name": "Slide03",
+          "file": "images/mscki078n74ofx/msdbdmtvlapo2q.png",
+          "order": 2
+        },
+        {
+          "id": "msdbdn75wc4pd9",
+          "name": "Slide04",
+          "file": "images/mscki078n74ofx/msdbdn75wc4pd9.png",
+          "order": 3
+        },
+        {
+          "id": "msdbdnqdfx5ues",
+          "name": "Slide05",
+          "file": "images/mscki078n74ofx/msdbdnqdfx5ues.png",
+          "order": 4
+        },
+        {
+          "id": "msdbdo8vu3kdbx",
+          "name": "Slide06",
+          "file": "images/mscki078n74ofx/msdbdo8vu3kdbx.png",
+          "order": 5
+        },
+        {
+          "id": "msdbdom26ef3bh",
+          "name": "Slide07",
+          "file": "images/mscki078n74ofx/msdbdom26ef3bh.png",
+          "order": 6
+        },
+        {
+          "id": "msdbdoy6u0pry7",
+          "name": "Slide08",
+          "file": "images/mscki078n74ofx/msdbdoy6u0pry7.png",
+          "order": 7
+        },
+        {
+          "id": "msdbdp9huf5qun",
+          "name": "Slide09",
+          "file": "images/mscki078n74ofx/msdbdp9huf5qun.png",
+          "order": 8
+        },
+        {
+          "id": "msdbdpnorrv8w4",
+          "name": "Slide10",
+          "file": "images/mscki078n74ofx/msdbdpnorrv8w4.png",
+          "order": 9
+        },
+        {
+          "id": "msdbdq1p7nu2tw",
+          "name": "Slide11",
+          "file": "images/mscki078n74ofx/msdbdq1p7nu2tw.png",
+          "order": 10
+        },
+        {
+          "id": "msdbdqflpebpju",
+          "name": "Slide12",
+          "file": "images/mscki078n74ofx/msdbdqflpebpju.png",
+          "order": 11
+        },
+        {
+          "id": "msdbdqtmgunbjn",
+          "name": "Slide13",
+          "file": "images/mscki078n74ofx/msdbdqtmgunbjn.png",
+          "order": 12
+        },
+        {
+          "id": "msdbdr8rducfrs",
+          "name": "Slide14",
+          "file": "images/mscki078n74ofx/msdbdr8rducfrs.png",
+          "order": 13
+        },
+        {
+          "id": "msdbdrob2o6izv",
+          "name": "Slide15",
+          "file": "images/mscki078n74ofx/msdbdrob2o6izv.png",
+          "order": 14
+        },
+        {
+          "id": "msdbds4bzlva96",
+          "name": "Slide16",
+          "file": "images/mscki078n74ofx/msdbds4bzlva96.png",
+          "order": 15
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "msfcf692lv6v6o",
+      "name": "20260805_해양레저체험복합센터(2부)",
+      "slides": [
+        {
+          "id": "msfcfjll1pfgrb",
+          "name": "Slide01",
+          "file": "images/msfcf692lv6v6o/msfcfjll1pfgrb.png",
+          "order": 0
+        },
+        {
+          "id": "msfcfjn4lwd6dx",
+          "name": "Slide02",
+          "file": "images/msfcf692lv6v6o/msfcfjn4lwd6dx.png",
+          "order": 1
+        },
+        {
+          "id": "msfcfjoswsbtf2",
+          "name": "Slide03",
+          "file": "images/msfcf692lv6v6o/msfcfjoswsbtf2.png",
+          "order": 2
+        },
+        {
+          "id": "msfcfjq7v3jo0c",
+          "name": "Slide04",
+          "file": "images/msfcf692lv6v6o/msfcfjq7v3jo0c.png",
+          "order": 3
+        },
+        {
+          "id": "msfcfjqwx538ci",
+          "name": "Slide05",
+          "file": "images/msfcf692lv6v6o/msfcfjqwx538ci.png",
+          "order": 4
+        },
+        {
+          "id": "msfcfjrpyvol88",
+          "name": "Slide06",
+          "file": "images/msfcf692lv6v6o/msfcfjrpyvol88.png",
+          "order": 5
+        },
+        {
+          "id": "msfcfjsg5g6t7t",
+          "name": "Slide07",
+          "file": "images/msfcf692lv6v6o/msfcfjsg5g6t7t.png",
+          "order": 6
+        },
+        {
+          "id": "msfcfjt52yf2ii",
+          "name": "Slide08",
+          "file": "images/msfcf692lv6v6o/msfcfjt52yf2ii.png",
+          "order": 7
+        },
+        {
+          "id": "msfcfjtxx3n181",
+          "name": "Slide09",
+          "file": "images/msfcf692lv6v6o/msfcfjtxx3n181.png",
+          "order": 8
+        },
+        {
+          "id": "msfcfjutclha71",
+          "name": "Slide10",
+          "file": "images/msfcf692lv6v6o/msfcfjutclha71.png",
+          "order": 9
+        },
+        {
+          "id": "msfcfjvj0pyphu",
+          "name": "Slide11",
+          "file": "images/msfcf692lv6v6o/msfcfjvj0pyphu.png",
+          "order": 10
+        },
+        {
+          "id": "msfcfjw91sjy0u",
+          "name": "Slide12",
+          "file": "images/msfcf692lv6v6o/msfcfjw91sjy0u.png",
+          "order": 11
+        },
+        {
+          "id": "msfcfjwxsfdq23",
+          "name": "Slide13",
+          "file": "images/msfcf692lv6v6o/msfcfjwxsfdq23.png",
+          "order": 12
+        },
+        {
+          "id": "msfcfjxor26hsi",
+          "name": "Slide14",
+          "file": "images/msfcf692lv6v6o/msfcfjxor26hsi.png",
+          "order": 13
+        },
+        {
+          "id": "msfcfjyauq9q89",
+          "name": "Slide15",
+          "file": "images/msfcf692lv6v6o/msfcfjyauq9q89.png",
+          "order": 14
+        },
+        {
+          "id": "msfcfjz004tbno",
+          "name": "Slide16",
+          "file": "images/msfcf692lv6v6o/msfcfjz004tbno.png",
+          "order": 15
+        },
+        {
+          "id": "msfcfjzorhk331",
+          "name": "Slide17",
+          "file": "images/msfcf692lv6v6o/msfcfjzorhk331.png",
+          "order": 16
+        },
+        {
+          "id": "msfcfk0denej96",
+          "name": "Slide18",
+          "file": "images/msfcf692lv6v6o/msfcfk0denej96.png",
+          "order": 17
+        },
+        {
+          "id": "msfcfk13mjyoa0",
+          "name": "Slide19",
+          "file": "images/msfcf692lv6v6o/msfcfk13mjyoa0.png",
+          "order": 18
+        },
+        {
+          "id": "msfcfk1tyasks2",
+          "name": "Slide20",
+          "file": "images/msfcf692lv6v6o/msfcfk1tyasks2.png",
+          "order": 19
+        },
+        {
+          "id": "msfcfk2kiyyano",
+          "name": "Slide21",
+          "file": "images/msfcf692lv6v6o/msfcfk2kiyyano.png",
+          "order": 20
+        },
+        {
+          "id": "msfcfk39j8cd7s",
+          "name": "Slide22",
+          "file": "images/msfcf692lv6v6o/msfcfk39j8cd7s.png",
+          "order": 21
+        },
+        {
+          "id": "msfcfk3ze2ogws",
+          "name": "Slide23",
+          "file": "images/msfcf692lv6v6o/msfcfk3ze2ogws.png",
+          "order": 22
+        },
+        {
+          "id": "msfcfk4otqlbyr",
+          "name": "Slide24",
+          "file": "images/msfcf692lv6v6o/msfcfk4otqlbyr.png",
+          "order": 23
+        },
+        {
+          "id": "msfcfk5epbqhpn",
+          "name": "Slide25",
+          "file": "images/msfcf692lv6v6o/msfcfk5epbqhpn.png",
+          "order": 24
+        },
+        {
+          "id": "msfcfk647mf6sk",
+          "name": "Slide26",
+          "file": "images/msfcf692lv6v6o/msfcfk647mf6sk.png",
+          "order": 25
+        },
+        {
+          "id": "msfcfk6sli0mmg",
+          "name": "Slide27",
+          "file": "images/msfcf692lv6v6o/msfcfk6sli0mmg.png",
+          "order": 26
+        },
+        {
+          "id": "msfcfk7i1gjiqb",
+          "name": "Slide28",
+          "file": "images/msfcf692lv6v6o/msfcfk7i1gjiqb.png",
+          "order": 27
+        },
+        {
+          "id": "msfcfk89pe2e5a",
+          "name": "Slide29",
+          "file": "images/msfcf692lv6v6o/msfcfk89pe2e5a.png",
+          "order": 28
+        },
+        {
+          "id": "msfcfk8yrhagkl",
+          "name": "Slide30",
+          "file": "images/msfcf692lv6v6o/msfcfk8yrhagkl.png",
+          "order": 29
+        },
+        {
+          "id": "msfcfk9hkbsuh4",
+          "name": "Slide31",
+          "file": "images/msfcf692lv6v6o/msfcfk9hkbsuh4.png",
+          "order": 30
+        },
+        {
+          "id": "msfcfk9z2si2cu",
+          "name": "Slide32",
+          "file": "images/msfcf692lv6v6o/msfcfk9z2si2cu.png",
+          "order": 31
+        },
+        {
+          "id": "msfcfkai016n18",
+          "name": "Slide33",
+          "file": "images/msfcf692lv6v6o/msfcfkai016n18.png",
+          "order": 32
+        },
+        {
+          "id": "msfcfkb0gao510",
+          "name": "Slide34",
+          "file": "images/msfcf692lv6v6o/msfcfkb0gao510.png",
+          "order": 33
+        },
+        {
+          "id": "msfcfkbh8qlf42",
+          "name": "Slide35",
+          "file": "images/msfcf692lv6v6o/msfcfkbh8qlf42.png",
+          "order": 34
+        },
+        {
+          "id": "msfcfkc1g6p7lj",
+          "name": "Slide36",
+          "file": "images/msfcf692lv6v6o/msfcfkc1g6p7lj.png",
+          "order": 35
+        },
+        {
+          "id": "msfcfkcm4p76lw",
+          "name": "Slide37",
+          "file": "images/msfcf692lv6v6o/msfcfkcm4p76lw.png",
+          "order": 36
+        },
+        {
+          "id": "msfcfkd9crays9",
+          "name": "Slide38",
+          "file": "images/msfcf692lv6v6o/msfcfkd9crays9.png",
+          "order": 37
+        },
+        {
+          "id": "msfcfkdzsqg8mo",
+          "name": "Slide39",
+          "file": "images/msfcf692lv6v6o/msfcfkdzsqg8mo.png",
+          "order": 38
+        }
+      ],
+      "public": true
+    },
+    {
+      "id": "mshkjaicyqny8o",
+      "name": "20260806_축산물품질평가원(만족도조사)",
+      "slides": [
+        {
+          "id": "msjpauj3l3veza",
+          "name": "000",
+          "file": "images/mshkjaicyqny8o/msjpauj3l3veza.png",
+          "order": 0
+        },
+        {
+          "id": "msjpaujw5ll78j",
+          "name": "001",
+          "file": "images/mshkjaicyqny8o/msjpaujw5ll78j.png",
+          "order": 1
+        },
+        {
+          "id": "msjpaukyhz1ik6",
+          "name": "002",
+          "file": "images/mshkjaicyqny8o/msjpaukyhz1ik6.png",
+          "order": 2
+        },
+        {
+          "id": "msjpaulue8v4be",
+          "name": "003",
+          "file": "images/mshkjaicyqny8o/msjpaulue8v4be.png",
+          "order": 3
+        },
+        {
+          "id": "msjpaums0biuv3",
+          "name": "004",
+          "file": "images/mshkjaicyqny8o/msjpaums0biuv3.png",
+          "order": 4
+        },
+        {
+          "id": "msjpaunsvetni1",
+          "name": "005",
+          "file": "images/mshkjaicyqny8o/msjpaunsvetni1.png",
+          "order": 5
+        },
+        {
+          "id": "msjpauomewrfxz",
+          "name": "006",
+          "file": "images/mshkjaicyqny8o/msjpauomewrfxz.png",
+          "order": 6
+        },
+        {
+          "id": "msjpaupjzjza8o",
+          "name": "007",
+          "file": "images/mshkjaicyqny8o/msjpaupjzjza8o.png",
+          "order": 7
+        },
+        {
+          "id": "msjpauqiezpubg",
+          "name": "008",
+          "file": "images/mshkjaicyqny8o/msjpauqiezpubg.png",
+          "order": 8
+        },
+        {
+          "id": "msjpaurcxm2l3a",
+          "name": "009",
+          "file": "images/mshkjaicyqny8o/msjpaurcxm2l3a.png",
+          "order": 9
+        },
+        {
+          "id": "msjpaus6pwisqq",
+          "name": "010",
+          "file": "images/mshkjaicyqny8o/msjpaus6pwisqq.png",
+          "order": 10
+        },
+        {
+          "id": "msjpaut0y8glng",
+          "name": "011",
+          "file": "images/mshkjaicyqny8o/msjpaut0y8glng.png",
+          "order": 11
+        },
+        {
+          "id": "msjpauttj491so",
+          "name": "012",
+          "file": "images/mshkjaicyqny8o/msjpauttj491so.png",
+          "order": 12
+        },
+        {
+          "id": "msjpauuratne7f",
+          "name": "013",
+          "file": "images/mshkjaicyqny8o/msjpauuratne7f.png",
+          "order": 13
+        },
+        {
+          "id": "msjpauvifxy2ar",
+          "name": "014",
+          "file": "images/mshkjaicyqny8o/msjpauvifxy2ar.png",
+          "order": 14
+        }
+      ],
+      "public": true
     }
   ]
 };
